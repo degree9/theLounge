@@ -6,7 +6,8 @@
                    [markdown-clj              "0.9.63"]
                    [adzerk/boot-cljs          "0.0-2814-0"]
                    [tailrecursion/boot-hoplon "0.1.0-SNAPSHOT"]
-                   [tailrecursion/hoplon      "6.0.0-SNAPSHOT"]]
+                   [tailrecursion/hoplon      "6.0.0-SNAPSHOT"]
+                   [cljsjs/jquery             "1.9.1-0"]]
   :source-paths   #{"src"}
   :resource-paths #{"resources/assets"}
   :target-path    "resources/public")
