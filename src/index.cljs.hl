@@ -7,8 +7,8 @@
 (def route (route-cell))
 
 (bot/object* ::app {:tags #{:app}})
-(defc app (bot/create ::app))
-(defc apptype (bot/->id @app))
+(defc app (bot/object ::app))
+(defc apptype (bot/obj-id @app))
 
 (def bootstrap-version "3.3.1")
 

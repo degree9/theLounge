@@ -3,7 +3,7 @@
             [crate.binding :refer [sub-swap! subatom sub-reset! deref?]])
   (:require-macros [tailrecursion.javelin :refer [cell=]]))
 
-(def obj-id (cell 0))
+(def +obj-id+ (cell 0))
 
 (def object-defs (cell {}))
 
@@ -13,7 +13,16 @@
 
 (def instances (cell (sorted-map)))
 
-(defn ->id [obj]
+(defn update-in! [obj & r]
+  (swap! obj #(apply update-in % r)))
+
+(defn assoc-in! [obj k v]
+  (when (and k (not (sequential? k)))
+    (throw (js/Error. (str "Associate requires a sequence of keys: " k))))
+  (swap! obj #(assoc-in % k v)))
+
+
+(defn obj-id [obj]
   (if (deref? obj)
     (::id @obj)
     (::id obj)))
@@ -29,11 +38,11 @@
     (when (contains? map ::type)
       (reset! object-defs (assoc (dissoc object-defs :init) (::type map) map)))))
 
-(defn create [obj-name & args]
+(defn object [obj-name & args]
   (let [obj     (if (keyword? obj-name)
                   (@object-defs obj-name)
                   obj-name)
-        id      (or (::id obj) (swap! obj-id inc))
+        id      (or (::id obj) (swap! +obj-id+ inc))
         new-obj    (cell (assoc obj
                         ::id id
                         :args (merge (:args obj) args)
@@ -42,10 +51,16 @@
     (swap! instances assoc (::id @new-obj) new-obj)
     new-obj))
 
-(defn behavior* [name map]
+(defn behavior [name map]
   (let [beh (merge {:name name}
                    map)]
     (swap! behaviors assoc (:name beh) beh)))
+
+(defn beh-add! [obj beh]
+  (update! obj [:behaviors] conj beh))
+
+(defn beh-rem! [obj beh]
+  (update! obj [:behaviors] #(remove #{beh} %)))
 
 
 
