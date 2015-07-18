@@ -1,0 +1,18 @@
+(ns lounge.lang.twitter)
+
+(defn load-bootstrap-cdn [version]
+  (let [proto  "//"
+        domain "netdna.bootstrapcdn.com"
+        path   (str "/bootstrap/" version)
+        css    (str proto domain path "/css/")
+        js     (str proto domain path "/js/")
+        link   #(link :rel "stylesheet" :type "text/css" :href (str css %))
+        script #(script :type "text/javascript" :src (str js %))]
+    [(html-meta :charset "utf-8")
+     (html-meta :http-equiv "X-UA-Compatible" :content "IE=edge")
+     (html-meta :name "viewport" :content "width=device-width, initial-scale=1")
+     (link "bootstrap.min.css")
+     (link "bootstrap-theme.min.css")
+     (script "bootstrap.min.js")]))
+
+(defn hi [] "Hello, World!")

@@ -1,5 +1,6 @@
 (set-env!
-  :dependencies  '[[clj-tagsoup               "0.3.0"]
+  :dependencies  '[[org.clojure/clojure       "1.7.0"]
+                   [clj-tagsoup               "0.3.0"]
                    [adzerk/boot-cljs-repl     "0.1.9"]
                    [adzerk/boot-reload        "0.2.6"]
                    [pandeiro/boot-http        "0.6.2"]
@@ -7,7 +8,10 @@
                    [adzerk/boot-cljs          "0.0-2814-0"]
                    [tailrecursion/boot-hoplon "0.1.0-SNAPSHOT"]
                    [tailrecursion/hoplon      "6.0.0-SNAPSHOT"]
-                   [cljsjs/jquery             "1.9.1-0"]]
+                   [cljsjs/jquery             "1.9.1-0"]
+                   [tailrecursion/javelin     "3.8.0"]
+                   [crate "0.2.4"]]
+
   :source-paths   #{"src"}
   :resource-paths #{"resources/assets"}
   :target-path    "resources/public")
