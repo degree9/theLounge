@@ -6,9 +6,19 @@
 
 (def route (route-cell))
 
-(bot/object* ::app {:tags #{:app}})
-(defc app (bot/object ::app))
-(defc apptype (bot/obj-id @app))
+(bot/obj-create :nullfn {:action nil} :bot/behavior)
+
+
+(defc behobj (bot/obj-create ::newbeh {} :bot/behavior))
+(defc tagobj (bot/obj-create ::newtag {} :bot/tag))
+(defc lounge (bot/obj-create ::lounge {} :bot/object))
+
+
+(bot/+bot! @lounge :behaviors ::nullfn)
+(bot/+bot! @lounge :behaviors ::newbeh)
+
+(bot/-bot! @lounge :behaviors ::nullfn)
+(bot/-bot! @lounge :behaviors ::newbeh)
 
 (def bootstrap-version "3.3.1")
 
@@ -60,4 +70,4 @@
                   (p "Maecenas sed diam eget risus varius blandit sit amet non magne.")))
         (footer :class "footer"
                 (p "Copyright Company 2014")
-                (cell= (.log js/console "ID: "apptype))))))
+                (cell= (.log js/console "ID: "@lounge))))))

@@ -7,61 +7,86 @@
 
 (def object-defs (cell {}))
 
-(def behaviors (cell {}))
-
-(def tags (cell {}))
-
 (def instances (cell (sorted-map)))
+
+;;sync refrence links
+(defn refresh! [obj]
+  ())
+
 
 (defn update-in! [obj & r]
   (swap! obj #(apply update-in % r)))
 
-(defn assoc-in! [obj k v]
-  (when (and k (not (sequential? k)))
-    (throw (js/Error. (str "Associate requires a sequence of keys: " k))))
-  (swap! obj #(assoc-in % k v)))
+(defn by-tag [tag]
+  (sort-by (comp ::id deref)
+           (filter #(when-let [ts (:tags (deref %))]
+                      (ts tag))
+                   (vals @instances))))
 
+(defn by-type [coll type]
+  (filter #(= type (::type (deref %))) (vals coll)))
+
+(defn by-name [coll name]
+  (filter #(= name (:name (deref %))) (vals coll)))
+
+(defn inst-by-type [type]
+  (by-type @instances type))
+
+(defn inst-by-name [name]
+  (by-name @instances name))
+
+(defn objdef-by-type [type]
+  (by-type @object-defs type))
 
 (defn obj-id [obj]
   (if (deref? obj)
     (::id @obj)
     (::id obj)))
 
-(defn object* [name map]
-  (let [obj (merge {:behaviors #{}
-                    :tags #{}
-                    :triggers []
-                    :listeners {}
-                    :children {}
-                    ::type name}
-                   map)]
+(defn obj-def* [name map basetype]
+  (let [base    (or (@object-defs basetype) nil)
+        default {::type name}
+        obj (merge base
+                   default
+                   (dissoc map :name))]
     (when (contains? map ::type)
-      (reset! object-defs (assoc (dissoc object-defs :init) (::type map) map)))))
+      (reset! object-defs (assoc object-defs (::type map) map)))))
 
-(defn object [obj-name & args]
-  (let [obj     (if (keyword? obj-name)
-                  (@object-defs obj-name)
-                  obj-name)
+(obj-def* ::object {:behaviors #{}
+                    :events #{}
+                    :tags #{:object}}
+          nil)
+
+(obj-def* ::behavior {:action nil
+                      :events #{}
+                      :tags #{:behavior}}
+          nil)
+
+(obj-def* ::tag {:behaviors #{}
+                 :children #{}
+                 :events #{}
+                 :listeners #{}
+                 :tags #{:tag}}
+          nil)
+
+
+(defn obj-create [obj-name map basetype & args]
+  (let [obj     (@object-defs basetype)
         id      (or (::id obj) (swap! +obj-id+ inc))
-        new-obj    (cell (assoc obj
-                        ::id id
-                        :args (merge (:args obj) args)
-                        :behaviors (set (:behaviors obj))
-                        :tags (set (conj (:tags obj) :object))))]
+        new-obj (cell (merge obj
+                             map
+                             {:name obj-name
+                              ::id id
+                              :args (merge (:args obj) args)
+                              :behaviors (set (:behaviors obj))
+                              :tags (set (conj (:tags obj) :object))}))]
     (swap! instances assoc (::id @new-obj) new-obj)
     new-obj))
 
-(defn behavior [name map]
-  (let [beh (merge {:name name}
-                   map)]
-    (swap! behaviors assoc (:name beh) beh)))
+(defn +bot! [obj prop sub]
+  (update-in! obj [prop] conj sub))
 
-(defn beh-add! [obj beh]
-  (update! obj [:behaviors] conj beh))
+(defn -bot! [obj prop sub]
+  (update-in! obj [prop] disj sub))
 
-(defn beh-rem! [obj beh]
-  (update! obj [:behaviors] #(remove #{beh} %)))
-
-
-
-
+(defn raise [obj b])
