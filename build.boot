@@ -1,5 +1,6 @@
 (set-env!
   :dependencies  '[[org.clojure/clojure       "1.7.0"]
+                   [org.clojure/algo.generic  "0.1.2"]
                    [clj-tagsoup               "0.3.0"]
                    [adzerk/boot-cljs-repl     "0.1.9"]
                    [adzerk/boot-reload        "0.2.6"]
@@ -10,7 +11,8 @@
                    [tailrecursion/hoplon      "6.0.0-SNAPSHOT"]
                    [cljsjs/jquery             "1.9.1-0"]
                    [tailrecursion/javelin     "3.8.0"]
-                   [crate "0.2.4"]]
+                   [crate "0.2.4"]
+                   [fmap-clojure "0.1.5"]]
 
   :source-paths   #{"src"}
   :resource-paths #{"resources/assets"}

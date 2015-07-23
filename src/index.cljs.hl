@@ -6,19 +6,26 @@
 
 (def route (route-cell))
 
-(bot/obj-create :nullfn {:action nil} :bot/behavior)
+(def nullfn (bot/bot* ::testfn {:events #{:init} :action nil} :lounge.bot/behavior))
 
 
-(defc behobj (bot/obj-create ::newbeh {} :bot/behavior))
-(defc tagobj (bot/obj-create ::newtag {} :bot/tag))
-(defc lounge (bot/obj-create ::lounge {} :bot/object))
+(def behobj (bot/bot* ::newbeh {:events #{:init} :action nil} :lounge.bot/behavior))
+(def tagobj (bot/bot* ::newtag {} :lounge.bot/tag))
+(def newobj (bot/bot* :lounge {:events #{:init}} :lounge.bot/object))
 
+(bot/+bot! newobj :behaviors ::testfn)
 
-(bot/+bot! @lounge :behaviors ::nullfn)
-(bot/+bot! @lounge :behaviors ::newbeh)
+(bot/+bot! newobj :behaviors ::newbeh)
+(bot/+bot! newobj :tags ::newtag)
 
-(bot/-bot! @lounge :behaviors ::nullfn)
-(bot/-bot! @lounge :behaviors ::newbeh)
+(bot/raise newobj :init)
+
+(cell= (.log js/console "[instances]" (count bot/instances)))
+
+;(def instbytype (doall (bot/inst-by-type :lounge.bot/object)))
+;(def instbyname (doall (bot/inst-by-name ::newobj)))
+;(def instbytag  (doall (bot/inst-by-tag :object)))
+
 
 (def bootstrap-version "3.3.1")
 
@@ -70,4 +77,4 @@
                   (p "Maecenas sed diam eget risus varius blandit sit amet non magne.")))
         (footer :class "footer"
                 (p "Copyright Company 2014")
-                (cell= (.log js/console "ID: "@lounge))))))
+                (cell= (.log js/console "[Top 2 Bottom!] Complete!" ))))))

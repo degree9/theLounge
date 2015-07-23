@@ -1,92 +1,132 @@
 (ns lounge.bot
   (:require [tailrecursion.javelin :refer [cell]]
-            [crate.binding :refer [sub-swap! subatom sub-reset! deref?]])
-  (:require-macros [tailrecursion.javelin :refer [cell=]]))
+            [crate.binding :refer [sub-swap! subatom sub-reset! deref?]]
+            [clojure.set :refer [intersection]]
+            )
+  (:require-macros [tailrecursion.javelin :refer [cell=]]
+                   [fmap-clojure.core :as fmap]))
 
-(def +obj-id+ (cell 0))
+(defc +obj-id+ 0)
 
-(def object-defs (cell {}))
+(defc object-defs {})
 
-(def instances (cell (sorted-map)))
+(defc instances (sorted-map))
+
+(defn doderef! [obj]
+  (if (deref? obj)
+    @obj
+    obj))
 
 ;;sync refrence links
 (defn refresh! [obj]
   ())
 
+(defn reset-inst! [new-obj]
+  (.log js/console "[reset-inst! new-obj]:" new-obj)
+  (reset! instances (assoc @instances (::id new-obj) new-obj))
+  new-obj)
 
-(defn update-in! [obj & r]
-  (swap! obj #(apply update-in % r)))
+(defn reset-def! [new-obj]
+  (swap! object-defs (merge (@object-defs (::type new-obj)) new-obj)))
 
-(defn by-tag [tag]
-  (sort-by (comp ::id deref)
-           (filter #(when-let [ts (:tags (deref %))]
-                      (ts tag))
-                   (vals @instances))))
-
-(defn by-type [coll type]
-  (filter #(= type (::type (deref %))) (vals coll)))
-
-(defn by-name [coll name]
-  (filter #(= name (:name (deref %))) (vals coll)))
+(defn by-prop [prop name coll]
+  (for [c coll
+        :when (or (= (prop (val c)) name)
+                  (contains? (prop (val c)) name))]
+          (key c)))
 
 (defn inst-by-type [type]
-  (by-type @instances type))
+  (by-prop ::type type @instances))
+
+(defn inst-by-tag [tag]
+  (by-prop :tags tag @instances))
 
 (defn inst-by-name [name]
-  (by-name @instances name))
+  (by-prop :name name @instances))
 
 (defn objdef-by-type [type]
-  (by-type @object-defs type))
+  (by-prop ::type type @object-defs))
 
-(defn obj-id [obj]
-  (if (deref? obj)
-    (::id @obj)
-    (::id obj)))
-
-(defn obj-def* [name map basetype]
+(defn bot-def* [name map basetype]
   (let [base    (or (@object-defs basetype) nil)
         default {::type name}
         obj (merge base
                    default
                    (dissoc map :name))]
-    (when (contains? map ::type)
-      (reset! object-defs (assoc object-defs (::type map) map)))))
+    (reset! object-defs (assoc @object-defs (::type obj) obj))
+    (.log js/console "[bot-def* obj]" obj)
+    (.log js/console "[bot-def*]" @object-defs)))
 
-(obj-def* ::object {:behaviors #{}
-                    :events #{}
-                    :tags #{:object}}
+(bot-def* ::object {:action    nil
+                    :behaviors #{}
+                    :children  #{}
+                    :events    #{}
+                    :init      (fn [x] x)
+                    :listeners #{}
+                    :tags      #{:object}}
           nil)
 
-(obj-def* ::behavior {:action nil
-                      :events #{}
-                      :tags #{:behavior}}
-          nil)
+(bot-def* ::behavior {:tags #{:behavior}}
+          ::object)
 
-(obj-def* ::tag {:behaviors #{}
-                 :children #{}
-                 :events #{}
-                 :listeners #{}
-                 :tags #{:tag}}
-          nil)
+(bot-def* ::tag      {:tags #{:tag}}
+          ::object)
 
+(bot-def* ::event    {:tags #{:event}
+                      :predicate (sorted-map)
+                      :score (sorted-map) ;of values which correspond to predicates
+                      :result nil} ;summary response of event success/fail
+          ::object)
 
-(defn obj-create [obj-name map basetype & args]
-  (let [obj     (@object-defs basetype)
-        id      (or (::id obj) (swap! +obj-id+ inc))
-        new-obj (cell (merge obj
-                             map
-                             {:name obj-name
-                              ::id id
-                              :args (merge (:args obj) args)
-                              :behaviors (set (:behaviors obj))
-                              :tags (set (conj (:tags obj) :object))}))]
-    (swap! instances assoc (::id @new-obj) new-obj)
-    new-obj))
+(bot-def* ::init     {:tags #{:event}}
+          ::event)
+
+(defn bot* [obj-name map basetype & args]
+  (let [obj     (or (@object-defs basetype) (@object-defs ::object))
+        id      (swap! +obj-id+ inc)
+        new-obj (merge (dissoc obj :init) map {:name obj-name
+                                      ::id id
+                                      :args (merge (:args obj) (:args map) args)})]
+    (.log js/console "[bot* obj]" obj)
+    (.log js/console "[bot* new-obj]"(::id new-obj) new-obj)
+    (reset-inst! new-obj)
+    id))
+
+(defn- bot! [obj prop sub conjdisj]
+  (let [obj (@instances obj)
+        new-obj (merge obj {prop (set (conjdisj (prop obj) sub))})]
+    (.log js/console "[bot!] new-obj:" new-obj)
+    (reset-inst! new-obj)))
 
 (defn +bot! [obj prop sub]
-  (update-in! obj [prop] conj sub))
+  (.log js/console "[+bot!] obj prop sub:" obj prop sub)
+  (bot! obj prop sub conj))
+
 
 (defn -bot! [obj prop sub]
-  (update-in! obj [prop] disj sub))
+  (.log js/console "[-bot!] obj prop sub:" obj prop sub)
+  (bot! obj prop sub disj))
 
-(defn raise [obj b])
+(defn raise [objid ename basetype & args]
+  (let [obj (@instances objid)
+        eve (cond (keyword? ename)
+                  (bot* ename {} (or (@object-defs basetype) ::event))
+                  (map? ename)
+                  ename)
+        eid
+        einst (@instances eid)
+        behs (atom {})]
+    (when (contains? (:events obj) (:name einst))
+      (.log js/console "[raise] obj contained einst ref"))
+
+    einst
+    ))
+
+;  (let [obj (@instances obj)]
+;    (when (contains? (:events obj) e)
+;      (.log js/console "[event e]" e)
+;      (doseq [beh (:behaviors obj)]
+;        (let [behinst (inst-by-name beh)]
+;          (.log js/console "[event beh]" beh)
+;          (.log js/console "[event test]" )
+;          )))))
