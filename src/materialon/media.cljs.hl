@@ -1,0 +1,22 @@
+(ns materialon.media
+  (:require [materialon.core :as core]))
+
+(defelem res-img [attr children]
+  (let [attr (core/prepend-class attr "responsive-img")]
+    (img attr children)))
+
+(defelem circle-img [attr children]
+  (let [attr (core/prepend-class attr "circle")]
+    (res-img attr children)))
+
+(defelem video-container [attr children]
+  (let [attr (core/prepend-class attr "video-container")]
+    (div attr children)))
+
+(defelem video-container-no-controls [attr children]
+  (let [attr (core/append-class attr "no-controls")]
+    (video-container attr children)))
+
+(defelem res-video [attr children]
+  (let [attr (core/prepend-class attr "responsive-video")]
+    (video attr children)))

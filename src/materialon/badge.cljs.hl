@@ -1,0 +1,11 @@
+(ns materialon.badge
+  (:require [materialon.core :as core]))
+
+(defelem badge [attr children]
+  (let [attr (core/prepend-class attr "badge")]
+    (span attr children)))
+
+(defelem new-badge [attr children]
+  (let [attr (core/prepend-class attr "new")]
+    (badge attr children)))
+

@@ -1,0 +1,22 @@
+(ns materialon.table
+  (:require [materialon.core :as core]))
+
+(defelem table-bordered [attr children]
+  (let [attr (core/prepend-class attr "bordered")]
+    (table attr children)))
+
+(defelem table-striped [attr children]
+  (let [attr (core/prepend-class attr "striped")]
+    (table attr children)))
+
+(defelem table-highlight [attr children]
+  (let [attr (core/prepend-class attr "highlight")]
+    (table attr children)))
+
+(defelem table-centered [attr children]
+  (let [attr (core/prepend-class attr "centered")]
+    (table attr children)))
+
+(defelem table-responsive [attr children]
+  (let [attr (core/prepend-class attr "responsive-table")]
+    (table attr children)))

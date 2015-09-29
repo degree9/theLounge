@@ -1,0 +1,14 @@
+(ns materialon.navbar
+  (:require [materialon.core :as core]))
+
+(defelem brand-logo [attr children]
+  (let [attr (core/prepend-class attr "brand-logo")]
+    (a attr children)))
+
+(defelem nav-wrapper [attr children]
+  (let [attr (core/prepend-class attr "nav-wrapper")]
+    (nav (div attr children))))
+
+(defelem navbar-fixed [attr children]
+  (let [attr (core/prepend-class attr "navbar-fixed")]
+    (div attr children)))

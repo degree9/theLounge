@@ -1,80 +1,29 @@
 (page "index.html"
-      (:require        [lounge.lang.twitter :as twitter]
-                       [lounge.bot :as bot])
-      (:require        [tailrecursion.javelin :refer [cell route-cell]])
-      (:require-macros [tailrecursion.javelin :refer [cell= defc defc=]]))
+      (:require [materialon.layout :as layout]
+                [materialon.card :as card]
+                [materialon.grid :as grid]
+                [materialon.navbar :as navbar]
+                [materialon.parallax :as parallax]
+                [cljsjs.material]))
 
-(def route (route-cell))
-
-(def nullfn (bot/bot* ::testfn {:events #{:init} :action nil} :lounge.bot/behavior))
-
-
-(def behobj (bot/bot* ::newbeh {:events #{:init} :action nil} :lounge.bot/behavior))
-(def tagobj (bot/bot* ::newtag {} :lounge.bot/tag))
-(def newobj (bot/bot* :lounge {:events #{:init}} :lounge.bot/object))
-
-(bot/+bot! newobj :behaviors ::testfn)
-
-(bot/+bot! newobj :behaviors ::newbeh)
-(bot/+bot! newobj :tags ::newtag)
-
-(bot/raise newobj :init)
-
-(cell= (.log js/console "[instances]" (count bot/instances)))
-
-;(def instbytype (doall (bot/inst-by-type :lounge.bot/object)))
-;(def instbyname (doall (bot/inst-by-name ::newobj)))
-;(def instbytag  (doall (bot/inst-by-tag :object)))
-
-
-(def bootstrap-version "3.3.1")
-
-(html
-  (head
-   (twitter/load-bootstrap-cdn bootstrap-version)
-   (link :rel "icon" :href "../../favicon.ico")
-   (title "Narrow Jumbotron Template for Bootstrap")
-   (link :href "/css/jumbotron-narrow.css" :rel "stylesheet"))
-
-  (body
-   (div :class "container"
-        (div :class "header clearfix"
-             (nav
-              (ul :class "nav nav-pills pull-right"
-                  (li :role "presentation" :class "active")(a :href "#/Home/")
-                  (li :role "presentation")(a :href "#/About/")
-                  (li :role "presentation")(a :href "#/Contact/")))
-             (h3 :class "text-muted" "Project name"))
-        (div :class "jumbotron"
-             (h1 "Jumbotron heading")
-             (p :class "lead" "Cras justo odio, dapibus ac facilisis in, egestas eget quam. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.")
-             (p (a :class "btn btn-lg btn-success" :href "#" :role "button" "Sign up today")))
-        (div :class "jumbotron"
-             (h1 "Jumbotron heading")
-             (p :class "lead" "Cras justo odio, dapibus ac facilisis in, egestas eget quam. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.")
-             (p (a :class "btn btn-lg btn-success" :href "#" :role "button" "Sign up today")))
-        (div :class "row"
-             (div :class "col-md-4 "
-                  (h4 "Subheading")
-                  (p "Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.")
-                  (h4 "Subheading" )
-                  (p "Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.")
-                  (h4 "Subheading")
-                  (p "Maecenas sed diam eget risus varius blandit sit amet non magna."))
-             (div :class "col-md-4 panel"
-                  (h4 "Subheading")
-                  (p "Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.")
-                  (h4 "Subheading" )
-                  (p "Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.")
-                  (h4 "Subheading")
-                  (p "Maecenas sed diam eget risus varius blandit sit amet non magna."))
-             (div :class "col-md-4 "
-                  (h4 "Subheading")
-                  (p "Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.")
-                  (h4 "Subheading")
-                  (p "Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum")
-                  (h4 "Subheading")
-                  (p "Maecenas sed diam eget risus varius blandit sit amet non magne.")))
-        (footer :class "footer"
-                (p "Copyright Company 2014")
-                (cell= (.log js/console "[Top 2 Bottom!] Complete!" ))))))
+(html :lang "en"
+      (head
+       (html-meta :http-equiv "Content-Type" :content "text/html; charset=UTF-8")
+       (html-meta :name "viewport" :content "width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no")
+       ;(title "Parallax Template - Materialize")
+       ;(script :src "js/materialize.min.js")
+       (link :rel "stylesheet" :href "https://storage.googleapis.com/code.getmdl.io/1.0.4/material.blue_grey-indigo.min.css")
+       (script :src "https://storage.googleapis.com/code.getmdl.io/1.0.4/material.min.js")
+       (link :href "https://fonts.googleapis.com/icon?family=Material+Icons" :rel "stylesheet")
+       ;(link :rel "stylesheet" :href "https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/css/materialize.min.css")
+       ;(link :href "css/style.css" :type "text/css" :rel "stylesheet" :media "screen,projection")
+       )
+      (body
+       (layout/layout :header  (layout/layout-header
+                                (layout/icon)
+                                (layout/layout-header-row
+                                 (layout/layout-title "Degree9")
+                                 (layout/spacer)
+                                 (layout/navigation
+                                  (layout/navigation-link :href "#" "test"))))
+                      :content (layout/content))))

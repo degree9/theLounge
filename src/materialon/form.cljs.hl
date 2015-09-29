@@ -1,0 +1,26 @@
+(ns materialon.form
+  (:require [materialon.core :as core]))
+
+(defelem input-field [attr children]
+  (let [attr (core/prepend-class attr "input-field")]
+    (div attr children)))
+
+(defelem file-field [attr children]
+  (let [attr (core/prepend-class attr "file-field")]
+    (input-field attr children)))
+
+(defelem file-path-wrapper [attr children]
+  (let [attr (core/prepend-class attr "file-path-wrapper")]
+    (div attr children)))
+
+(defelem validate-input [attr children]
+  (let [attr (core/append-class attr "validate")]
+    (input attr children)))
+
+(defelem textarea-input [attr children]
+  (let [attr (core/append-class attr "materialize-textarea")]
+    (textarea attr children)))
+
+(defelem switch [attr children]
+  (let [attr (core/prepend-class attr "switch")]
+    (div attr children)))

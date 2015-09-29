@@ -1,0 +1,141 @@
+(ns materialon.layout
+  (:refer-hoplon :exclude [section])
+  (:require [materialon.core :as core]))
+
+(defelem layout [attr & children]
+  (let [attr     (core/prepend-class attr ["mdl-layout" "mdl-js-layout"])
+        header   (or (:header attr)  nil)
+        content  (or (:content attr) nil)
+        drawer   (or (:drawer attr)  nil)
+        attr     (dissoc attr :header :content :drawer)
+        children [header drawer content children]]
+    (div attr children)))
+
+(defelem icon [attr children]
+  (let [attr (core/prepend-class attr ["mdl-layout-icon"])]
+    (div attr children)))
+
+(defelem layout-title [attr children]
+  (let [attr (core/prepend-class attr ["mdl-layout-title"])]
+    (span attr children)))
+
+(defelem spacer [attr children]
+  (let [attr (core/prepend-class attr ["mdl-layout-spacer"])]
+    (div attr children)))
+
+(defelem layout-header-row [attr children]
+  (let [attr     (core/prepend-class attr ["mdl-layout__header-row"])
+        title    (or (:title attr)  nil)
+        nav      (or (:navigation attr)  nil)
+        attr     (dissoc attr :title :navigation)
+        children [title (spacer) nav children]]
+    (div attr children)))
+
+(defelem layout-header [attr children]
+  (let [attr     (core/prepend-class attr ["mdl-layout__header"])
+        icon     (or (:icon attr)  nil)
+        title    (or (:title attr)  nil)
+        nav      (or (:navigation attr) nil)
+        attr     (if (or (:fixed attr) nil)
+                   (core/append-class attr ["mdl-layout__header--scroll"])
+                   attr)
+        attr     (dissoc attr :icon :title :navigation)
+        children [icon (layout-header-row {:title title :navigation nav} [children])]]
+    (header attr children)))
+
+(defelem drawer [attr children]
+  (let [attr (core/prepend-class attr ["mdl-layout__drawer"])
+        title    (or (:title attr)  nil)
+        nav      (or (:navigation attr)  nil)
+        attr     (dissoc attr :title :navigation)
+        children [title nav children]]
+    (div attr children)))
+
+(defelem content [attr children]
+  (let [attr (core/prepend-class attr ["mdl-layout__content"])]
+    (main attr children)))
+
+(defelem navigation [attr & children]
+  (let [attr (core/prepend-class attr ["mdl-navigation"])]
+    (nav attr children)))
+
+(defelem navigation-link [attr & children]
+  (let [attr (core/prepend-class attr ["mdl-navigation__link"])]
+    (a attr children)))
+
+(defelem mini-footer [attr children]
+  (let [attr     (core/prepend-class attr ["mdl-mini-footer"])
+        leftsec  (or (:left-section attr)  nil)
+        rightsec (or (:right-section attr)  nil)
+        attr     (dissoc attr :left-section)
+        children [(mini-footer-leftsec leftsec) (mini-footer-rightsec rightsec) children]]
+    (footer attr children)))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+(defelem page-footer [attr children]
+  (let [attr (core/prepend-class attr ["page-footer"])]
+    (footer attr children)))
+
+(defelem footer-copyright [attr children]
+  (let [attr (core/prepend-class attr ["footer-copyright"])]
+    (div attr children)))
+
+(defelem container [attr children]
+  (let [attr (core/prepend-class attr ["container"])]
+    (div attr children)))
+
+(defelem section [attr children]
+  (let [attr (core/prepend-class attr ["section"])]
+    (div attr children)))
+
+(defelem divider [attr children]
+  (let [attr (core/prepend-class attr ["divider"])]
+    (div attr children)))
+
+(defelem valign-wrapper [attr children]
+  (let [attr (core/prepend-class attr ["valign-wrapper"])]
+    (div attr children)))
+
+(defelem hide [attr children]
+  (let [attr (core/append-class attr ["hide"])]
+    (div attr children)))
+
+(defelem hide-on-small [attr children]
+  (let [attr (core/append-class attr ["hide-on-small-only"])]
+    (div attr children)))
+
+(defelem hide-on-med [attr children]
+  (let [attr (core/append-class attr ["hide-on-med-only"])]
+    (div attr children)))
+
+(defelem hide-med-down [attr children]
+  (let [attr (core/append-class attr ["hide-on-med-and-down"])]
+    (div attr children)))
+
+(defelem hide-med-up [attr children]
+  (let [attr (core/append-class attr ["hide-on-med-and-up"])]
+    (div attr children)))
+
+(defelem hide-on-large [attr children]
+  (let [attr (core/append-class attr ["hide-on-large-only"])]
+    (div attr children)))
+
+(defelem hover [attr children]
+  (let [attr (core/append-class attr ["hoverable"])]
+    (div attr children)))
