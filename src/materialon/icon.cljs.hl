@@ -1,0 +1,26 @@
+(ns materialon.icon
+  (:require [materialon.core :as core]))
+
+(defn material-icons-font []
+  (link :href "https://fonts.googleapis.com/icon?family=Material+Icons" :rel "stylesheet"))
+
+(defelem material-icon [attr children]
+  (let [attr (core/prepend-class attr "material-icons")]
+    (i attr children)))
+
+(defelem icon-tiny [attr children]
+  (let [attr (core/prepend-class attr "tiny")]
+    (material-icon attr children)))
+
+(defelem icon-small [attr children]
+  (let [attr (core/prepend-class attr "small")]
+    (material-icon attr children)))
+
+(defelem icon-medium [attr children]
+  (let [attr (core/prepend-class attr "medium")]
+    (material-icon attr children)))
+
+(defelem icon-large [attr children]
+  (let [attr (core/prepend-class attr "large")]
+    (material-icon attr children)))
+

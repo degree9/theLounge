@@ -1,0 +1,10 @@
+(ns materialon.parallax
+  (:require [materialon.core :as core]))
+
+(defelem parallax-container [attr children]
+  (let [attr (core/prepend-class attr "parallax-container")]
+    (div attr children)))
+
+(defelem parallax [attr children]
+  (let [attr (core/prepend-class attr "parallax")]
+    (div attr children)))

@@ -1,0 +1,6 @@
+(ns materialon.chip
+  (:require [materialon.core :as core]))
+
+(defelem chip [attr children]
+  (let [attr (core/prepend-class attr "chip")]
+    (div attr children)))

@@ -1,0 +1,16 @@
+(ns materialon.preloader
+  (:require [materialon.core :as core]))
+
+(defelem progress-determinate [attr children]
+  (let [attr (core/prepend-class attr "determinate")]
+    (div {:class "progress"}
+         (div attr children))))
+
+(defelem progress-indeterminate [attr children]
+  (let [attr (core/prepend-class attr "indeterminate")]
+    (div {:class "progress"}
+         (div attr children))))
+
+(defelem preloader-wrapper [attr children]
+  (let [attr (core/prepend-class attr "preloader-wrapper")]
+    (div attr children)))

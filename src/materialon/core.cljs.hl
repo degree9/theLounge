@@ -1,0 +1,17 @@
+(ns materialon.core)
+
+(defn prepend-class [attr new]
+  (let [attrc (or (:class attr) nil)
+        new   (cond (string? new)
+                    [new]
+                    (vector? new)
+                    new)]
+    (assoc attr :class (clojure.string/join " " (into new attrc)))))
+
+(defn append-class [attr new]
+  (let [attrc (or (:class attr) nil)
+        new   (cond (string? new)
+                    [new]
+                    (vector? new)
+                    new)]
+    (assoc attr :class (clojure.string/join " " (into [attrc] new)))))

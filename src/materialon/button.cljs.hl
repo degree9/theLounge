@@ -1,0 +1,51 @@
+(ns materialon.button
+  (:require [materialon.core :as core]))
+
+(defelem btn-raised [attr children]
+  (let [attr  (core/append-class attr "btn")
+        attr  (if (contains? attr :waves)
+                (core/append-class attr ["waves-effect" (clojure.string/join ["waves-" (:waves attr)])])
+                attr)]
+    (a attr children)))
+
+(defelem btn-raised-lg [attr children]
+  (let [attr  (core/append-class attr "btn-large")
+        attr  (if (contains? attr :waves)
+                (core/append-class attr ["waves-effect" (clojure.string/join ["waves-" (:waves attr)])])
+                attr)]
+    (a attr children)))
+
+(defelem btn-float [attr children]
+  (let [attr  (core/append-class attr "btn-floating")
+        attr  (if (contains? attr :waves)
+                (core/append-class attr ["waves-effect" (clojure.string/join ["waves-" (:waves attr)])])
+                attr)]
+    (a attr children)))
+
+(defelem btn-float-lg [attr children]
+  (let [attr (core/append-class attr "btn-large")]
+    (btn-float attr children)))
+
+(defelem btn-flat [attr children]
+  (let [attr  (core/append-class attr "btn-flat")
+        attr  (if (contains? attr :waves)
+                (core/append-class attr ["waves-effect" (clojure.string/join ["waves-" (:waves attr)])])
+                attr)]
+    (a attr children)))
+
+(defelem btn-flat-lg [attr children]
+  (let [attr (core/append-class attr "btn-large")]
+    (btn-flat attr children)))
+
+(defelem btn-submit [attr children]
+  (let [attr (core/append-class attr "btn")
+        attr (assoc attr :type "submit")]
+    (button attr children)))
+
+(defelem btn-submit-lg [attr children]
+  (let [attr (core/append-class attr "btn-large")]
+    (btn-submit attr children)))
+
+(defelem btn-fixed-action [attr children]
+  (let [attr  (core/prepend-class attr "fixed-action-btn")]
+    (div attr children)))

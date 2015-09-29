@@ -1,0 +1,29 @@
+(page "index.html"
+      (:require [materialon.layout :as layout]
+                [materialon.card :as card]
+                [materialon.grid :as grid]
+                [materialon.navbar :as navbar]
+                [materialon.parallax :as parallax]
+                [cljsjs.material]))
+
+(html :lang "en"
+      (head
+       (html-meta :http-equiv "Content-Type" :content "text/html; charset=UTF-8")
+       (html-meta :name "viewport" :content "width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no")
+       ;(title "Parallax Template - Materialize")
+       ;(script :src "js/materialize.min.js")
+       (link :rel "stylesheet" :href "https://storage.googleapis.com/code.getmdl.io/1.0.4/material.blue_grey-indigo.min.css")
+       (script :src "https://storage.googleapis.com/code.getmdl.io/1.0.4/material.min.js")
+       (link :href "https://fonts.googleapis.com/icon?family=Material+Icons" :rel "stylesheet")
+       ;(link :rel "stylesheet" :href "https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/css/materialize.min.css")
+       ;(link :href "css/style.css" :type "text/css" :rel "stylesheet" :media "screen,projection")
+       )
+      (body
+       (layout/layout :header  (layout/layout-header
+                                (layout/icon)
+                                (layout/layout-header-row
+                                 (layout/layout-title "Degree9")
+                                 (layout/spacer)
+                                 (layout/navigation
+                                  (layout/navigation-link :href "#" "test"))))
+                      :content (layout/content))))
