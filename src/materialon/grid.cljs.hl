@@ -10,7 +10,7 @@
         attr     (dissoc attr :title :navigation)]
     (div attr children)))
 
-(defelem cell [attr children]
+(defelem cell [attr & children]
   (let [attr (core/prepend-class attr "mdl-cell")
         attr (if (or (:size attr) nil)
                (core/append-class attr [(clojure.string/join ["mdl-cell--" (:size attr) "-col"])])
