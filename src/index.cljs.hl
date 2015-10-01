@@ -4,7 +4,8 @@
                 [materialon.grid :as grid]
                 [materialon.navbar :as navbar]
                 [materialon.parallax :as parallax]
-                [cljsjs.material]))
+                [cljsjs.material]
+                [lounge.layout]))
 
 (html :lang "en"
       (head
@@ -19,11 +20,10 @@
        ;(link :href "css/style.css" :type "text/css" :rel "stylesheet" :media "screen,projection")
        )
       (body
-       (layout/layout :header  (layout/layout-header
-                                (layout/icon)
-                                (layout/layout-header-row
-                                 (layout/layout-title "Degree9")
-                                 (layout/spacer)
-                                 (layout/navigation
-                                  (layout/navigation-link :href "#" "test"))))
+       (layout/layout :header  (layout/layout-header :icon       (layout/icon)
+                                                     :title      (layout/title "Degree9")
+                                                     :navigation (layout/navigation
+                                                                  (layout/navigation-link :href "#" "test")))
+                      :drawer  [(lounge.layout/drawer-guest)
+                                (lounge.layout/drawer-user)]
                       :content (layout/content))))
