@@ -10,10 +10,6 @@
                    [hoplon/javelin            "3.8.2"]
                    [jeluard/boot-notify       "0.2.0"]
                    [boot/core                 "2.2.0"]
-                   [degree9/lounge-clj        "0.1.1"]
-                   [degree9/lounge.app        "0.1.0"]
-                   [degree9/lounge.twitter    "0.1.0"]
-                   [degree9/lounge.view       "0.1.0"]
                    [buddy                     "0.7.1"]
                    [cljsjs/material           "1.0.4-0"]]
 

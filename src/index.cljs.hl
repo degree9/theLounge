@@ -26,4 +26,12 @@
                                                                   (layout/navigation-link :href "#" "test")))
                       :drawer  [(lounge.layout/drawer-guest)
                                 (lounge.layout/drawer-user)]
-                      :content (layout/content))))
+                      :content [(card/card :color "light-blue-darken-4"
+                                     (card/card-content "Hey There the first Setup Card!")
+                                     (card/card-action :hover)
+                                )
+                                (card/card :color "light-blue-darken-4"
+                                     (card/card-content "Hey There the second Setup Card!")
+                                     (card/card-action))
+                                ]
+                      )))
