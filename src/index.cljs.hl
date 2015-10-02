@@ -20,10 +20,4 @@
        ;(link :href "css/style.css" :type "text/css" :rel "stylesheet" :media "screen,projection")
        )
       (body
-       (layout/layout :header  (layout/layout-header :icon       (layout/icon)
-                                                     :title      (layout/title "Degree9")
-                                                     :navigation (layout/navigation
-                                                                  (layout/navigation-link :href "#" "test")))
-                      :drawer  [(lounge.layout/drawer-guest)
-                                (lounge.layout/drawer-user)]
-                      :content (layout/content))))
+       (lounge.layout/layout)))

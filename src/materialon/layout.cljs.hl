@@ -2,10 +2,14 @@
   (:refer-hoplon :exclude [section title])
   (:require [materialon.core :as core]))
 
-(defelem layout [attr & children]
+(defelem mdl-content [attr children]
+  (let [attr (core/prepend-class attr ["mdl-layout__content"])]
+    (main attr children)))
+
+(defelem mdl-layout [attr & children]
   (let [attr     (core/prepend-class attr ["mdl-layout" "mdl-js-layout"])
         header   (or (:header attr)  nil)
-        content  (or (:content attr) nil)
+        content  (or (:content attr) (mdl-content))
         drawer   (or (:drawer attr)  nil)
         attr     (if (or (:fixed-drawer attr) nil)
                    (core/append-class attr ["mdl-layout--fixed-drawer"])
@@ -17,27 +21,27 @@
         children (into [header drawer content] children)]
     (div attr children)))
 
-(defelem icon [attr children]
+(defelem layout-icon [attr children]
   (let [attr (core/prepend-class attr ["mdl-layout-icon"])]
     (div attr children)))
 
-(defelem title [attr children]
+(defelem layout-title [attr children]
   (let [attr (core/prepend-class attr ["mdl-layout-title"])]
     (span attr children)))
 
-(defelem spacer [attr children]
+(defelem layout-spacer [attr children]
   (let [attr (core/prepend-class attr ["mdl-layout-spacer"])]
     (div attr children)))
 
-(defelem layout-header-row [attr children]
+(defelem header-row [attr children]
   (let [attr     (core/prepend-class attr ["mdl-layout__header-row"])
         title    (or (:title attr)  nil)
         nav      (or (:navigation attr)  nil)
         attr     (dissoc attr :title :navigation)
-        children (into [title (spacer) nav] children )]
+        children (into [title (layout-spacer) nav] children )]
     (div attr children)))
 
-(defelem layout-header [attr children]
+(defelem mdl-header [attr children]
   (let [attr     (core/prepend-class attr ["mdl-layout__header"])
         icon     (or (:icon attr)  nil)
         title    (or (:title attr)  nil)
@@ -51,11 +55,11 @@
         attr     (if (or (:transparent attr) nil)
                    (core/append-class attr ["mdl-layout__header--transparent"])
                    attr)
-        attr     (dissoc attr :icon :title :navigation :scroll :waterfall)
-        children [icon (layout-header-row {:title title :navigation nav} (into [] children))]]
+        attr     (dissoc attr :icon :title :navigation :scroll :waterfall :transparent)
+        children [icon (header-row {:title title :navigation nav} (into [] children))]]
     (header attr children)))
 
-(defelem drawer [attr & children]
+(defelem mdl-drawer [attr & children]
   (let [attr (core/prepend-class attr ["mdl-layout__drawer"])
         title    (or (:title attr)  nil)
         nav      (or (:navigation attr)  nil)
@@ -66,11 +70,8 @@
         children (into [title nav] children)]
     (div attr children)))
 
-(defelem content [attr children]
-  (let [attr (core/prepend-class attr ["mdl-layout__content"])]
-    (main attr children)))
 
-(defelem navigation [attr & children]
+(defelem mdl-navigation [attr & children]
   (let [attr (core/prepend-class attr ["mdl-navigation"])
         links    (or (:links attr)  nil)
         attr     (dissoc attr :links)
