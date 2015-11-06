@@ -1,6 +1,9 @@
 os: osx
 language: clojure
 before_script:
- - brew update
- - brew outdated boot-clj || brew upgrade boot-clj
+- brew update
+- brew outdated boot-clj || brew upgrade boot-clj
 script: boot travis-ci
+notifications:
+  slack:
+    secure: nkhWXunJwERToQZLJXZq0yZtb11eKMrtlV+BFooukcmN6MR1nOnks3JV++rGCZjPNl1VlCBJeLRotNkmLdc8VbNguwBR8dANlPFIfkme9Gzl/YDl61pmHgk1CMQ48Os8D1q5gm7BZYCCyNZuY9kGUhp3Tmfu3FZzkYrNHG+i5RoUGn1s8YFpuPo6rn5aKg4OHUwX/nuJsFYlLQWBAzaqiUz8Q6kl/rSzDSM/rtsgwJxB+E0PqiQLsYI112LIE+yrnd247GomQ9Od9HV6p0b8vdBiha1I8QXdta0D88YNGqhN5BOgQAxO7E2s8RmfFurfOffW2Sv1U3QSpPjoUrQiyWzTTNNNEMBVsD/mLaeg+dFokNWEexJdQj5L+NaVf+TvzQakxzXqfwNKDwzJyrE1h1acpZ3p41kHV9MHPYZ9kqJqykAHQ/l/JdIrebAv6C5px8P9ujFvoiAImsAT6hl3hfX6xHsQ/Ivr8dDs2P5tbb4+el9/QeF4uDrsEWr1nooTC+l7goan1ACFEe1ExDYta1G6PEu6Ff8rg0GY7j85eeuZNd+EgEqlqP+IR8ilGmpHZldEhzHxG+BgSBm6Zv3cDyfxHnBS19qkM46wD6hDe0m0eWzbKOLy5k32tmK/SUKVYPOZFvmvQQKs13Dnl6VglhPr7rq6MRmYvGPIWhBBSBM=
