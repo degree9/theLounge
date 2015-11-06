@@ -1,6 +1,6 @@
 os: osx
 language: clojure
-install:
+before_script:
  - brew update
  - brew outdated boot-clj || brew upgrade boot-clj
 script: boot travis-ci
