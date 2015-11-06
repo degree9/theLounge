@@ -1,0 +1,14 @@
+(ns lounge.ui.drawer.core
+  (:require [lounge.state :as state]
+            [silicone.paper :as paper]))
+
+(defelem drawer [attr & kids]
+  (let [id (:id attr)]
+    (paper/paper-header-panel
+     (merge {:drawer ""} attr)
+     kids)))
+
+(defelem drawer-toggle [attr & kids]
+  (let [attr (merge {:icon "menu"
+                     :paper-drawer-toggle ""} attr)]
+    (paper/paper-icon-button attr)))

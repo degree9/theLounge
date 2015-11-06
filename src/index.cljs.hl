@@ -1,23 +1,32 @@
 (page "index.html"
-      (:require [materialon.layout :as layout]
-                [materialon.card :as card]
-                [materialon.grid :as grid]
-                [materialon.navbar :as navbar]
-                [materialon.parallax :as parallax]
-                [cljsjs.material]
-                [lounge.layout]))
+      (:require [lounge.ui :as ui]
+                [lounge.state :as state]
+                [silicone.paper :as paper]
+                [silicone.neon :as neon]
+                [goog.dom]
+                ))
 
 (html :lang "en"
       (head
        (html-meta :http-equiv "Content-Type" :content "text/html; charset=UTF-8")
        (html-meta :name "viewport" :content "width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no")
-       ;(title "Parallax Template - Materialize")
-       ;(script :src "js/materialize.min.js")
-       (link :rel "stylesheet" :href "https://storage.googleapis.com/code.getmdl.io/1.0.4/material.blue_grey-indigo.min.css")
-       (script :src "https://storage.googleapis.com/code.getmdl.io/1.0.4/material.min.js")
-       (link :href "https://fonts.googleapis.com/icon?family=Material+Icons" :rel "stylesheet")
-       ;(link :rel "stylesheet" :href "https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/css/materialize.min.css")
-       ;(link :href "css/style.css" :type "text/css" :rel "stylesheet" :media "screen,projection")
-       )
-      (body
-       (lounge.layout/layout)))
+       (link :href "https://fonts.googleapis.com/css?family=Roboto" :rel "stylesheet" :type "text/css")
+       (paper/import-elements "polyelements")
+       (neon/import-elements "polyelements")
+       (title "Degree9"))
+      (body :unresolved ""
+       (ui/layout)
+            (style ".main {
+                   background-color: #eee;
+                   }
+                   .content {
+                   padding: 0 16px;
+                   }
+                   paper-card {
+                   height: 250px;
+                   width: 550px;
+                   margin: 16px auto;
+                   }
+                   ")))
+
+(ui/init)

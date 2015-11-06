@@ -1,0 +1,25 @@
+(ns lounge.ui
+  (:refer-hoplon :exclude [header main])
+  (:require [lounge.state   :as state]
+            [lounge.ui.drawer  :as drawer]
+            [lounge.ui.content :as content]
+            [silicone.paper :as paper]))
+
+(def layoutattr {:id "drawer-layout"
+                 :force-narrow ""
+                 :right-drawer (cell= (:right-drawer state/layout))})
+
+(defn reset-layout! []
+  (-> js/document (.getElementById "drawer-layout") .closeDrawer))
+
+(cell= (when (:auth state/layout)
+        (reset-layout!)))
+
+(defn init []
+  (content/activate-content))
+
+(defelem layout []
+  (paper/paper-drawer-panel
+   layoutattr
+   (drawer/drawers)
+   (content/content)))

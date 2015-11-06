@@ -1,0 +1,26 @@
+(ns lounge.ui.drawer.auth
+  (:require [lounge.ui.drawer.core :as drawer]
+            [lounge.state          :as state]
+            [lounge.state.auth     :as auth]
+            [silicone.iron         :as iron]
+            [silicone.paper        :as paper]))
+
+(def authform
+  (let [username (cell nil)
+        password (cell nil)]
+    (form {:id "auth-drawer-authform" :is "iron-form" :toggle (cell= (:unauth state/drawer))}
+     (paper/paper-input :label "Username" :value username :change #(reset! username @%))
+     (paper/paper-input :label "Password" :type "password" :value password :change #(reset! password @%))
+     (paper/paper-button {:click #(let []
+                                    (auth/auth! @username @password)
+                                    (reset! username "")
+                                    (reset! password ""))
+                          :raised ""} (iron/iron-icon :icon "account-circle")))))
+
+(def auth-drawer
+  (drawer/drawer
+   {:id "auth"}
+   (paper/paper-toolbar)
+   (div
+    {:style "padding: 24px;"}
+    (authform))))

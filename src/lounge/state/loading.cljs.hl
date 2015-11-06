@@ -1,0 +1,11 @@
+(ns lounge.state.loading
+  (:require [javelin.core :refer [cell]]
+            [castra.core  :refer [mkremote]])
+  (:require-macros [javelin.core :refer [defc defc= cell=]]))
+
+(defc loading nil)
+
+;(defc= loaded?      (not (nil? state)))
+(defc= loading?     (not (empty? (seq loading))))
+
+(cell= (.log js/console "[loading]" loading loading?))
