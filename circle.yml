@@ -4,6 +4,10 @@ dependencies:
     - chmod 755 boot
     - ./boot -V
 
+machine:
+  java:
+    version: oraclejdk8
+
 test:
   override:
     - ./boot test
