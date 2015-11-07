@@ -3,7 +3,6 @@ dependencies:
     - wget -O boot https://github.com/boot-clj/boot/releases/download/2.4.0/boot.sh
     - chmod 755 boot
     - ./boot -V
-    - ./boot checkout
 
 test:
   override:
