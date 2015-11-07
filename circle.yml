@@ -10,7 +10,7 @@ machine:
 
 test:
   override:
-    - ./boot
+    - ./boot test
 
 deployment:
   prod:

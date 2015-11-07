@@ -40,6 +40,11 @@
 (swap! boot.repl/*default-middleware*
        conj 'lighttable.nrepl.handler/lighttable-ops)
 
+(deftask test
+  "Test"
+  []
+  (speak))
+
 (deftask dev
   "Build theLounge for local development."
   []
