@@ -40,7 +40,7 @@
 (swap! boot.repl/*default-middleware*
        conj 'lighttable.nrepl.handler/lighttable-ops)
 
-(deftask test
+(deftask run-test
   "Test"
   []
   (speak))
