@@ -69,8 +69,8 @@
   "Build theLounge for production deployment."
   []
   (comp
-   (bower :directory "/polyelements"
-           :install {:iron-elements  "PolymerElements/iron-elements#^1.0.4"
-                     :paper-elements "PolymerElements/paper-elements#^1.0.5"})
+   ;(bower :directory "/polyelements"
+   ;        :install {:iron-elements  "PolymerElements/iron-elements#^1.0.4"
+   ;                  :paper-elements "PolymerElements/paper-elements#^1.0.5"})
    (hoplon :pretty-print true)
    (cljs   :optimizations :advanced :source-map true)))

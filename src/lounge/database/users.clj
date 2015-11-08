@@ -30,6 +30,6 @@
 
 (defn new-user [username email password]
   (users-insert {:_id (mu/random-uuid)
-                    :username username
-                    :email email
-                    :password (creds/hash-bcrypt password)}))
+                 :username username
+                 :email email
+                 :password (creds/hash-bcrypt password)}))
