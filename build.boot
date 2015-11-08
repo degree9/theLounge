@@ -43,7 +43,7 @@
 (deftask run-test
   "Test"
   []
-  (speak))
+  clojure.core/identity)
 
 (deftask dev
   "Build theLounge for local development."
