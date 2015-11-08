@@ -65,7 +65,7 @@
     (notify)
     (speak)))
 
-(deftask prod
+(deftask build
   "Build theLounge for production deployment."
   []
   (comp
@@ -73,9 +73,4 @@
            :install {:iron-elements  "PolymerElements/iron-elements#^1.0.4"
                      :paper-elements "PolymerElements/paper-elements#^1.0.5"})
    (hoplon :pretty-print true)
-   (cljs   :optimizations :advanced :source-map true)
-   (prerender)
-   (serve
-      :handler 'lounge.api/app
-      :reload true
-      :port 3000)))
+   (cljs   :optimizations :advanced :source-map true)))
