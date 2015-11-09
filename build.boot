@@ -65,7 +65,7 @@
     (notify)
     (speak)))
 
-(deftask build
+(deftask prod
   "Build theLounge for production deployment."
   []
   (comp
