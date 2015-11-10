@@ -58,35 +58,13 @@
     (notify)
     (speak)))
 
-(deftask docker
-  "Build theLounge for docker development."
-  []
-  (comp
-    (bower :directory "/polyelements"
-           :install {:iron-elements  "PolymerElements/iron-elements#^1.0.4"
-                     :paper-elements "PolymerElements/paper-elements#^1.0.5"
-                     :neon-elements "PolymerElements/neon-elements#^1.0.0"})
-    (watch)
-    (hoplon :pretty-print true)
-    (reload)
-    (cljs   :optimizations :none
-            :source-map    true)
-    (serve
-      :handler 'lounge.api/app
-      :reload true
-      :port 3000)
-    ))
-
 (deftask prod
   "Build theLounge for production deployment."
   []
   (comp
-   ;(bower :directory "/polyelements"
-   ;        :install {:iron-elements  "PolymerElements/iron-elements#^1.0.4"
-   ;                  :paper-elements "PolymerElements/paper-elements#^1.0.5"})
+   (bower :install {:iron-elements  "PolymerElements/iron-elements#^1.0.4"
+                    :paper-elements "PolymerElements/paper-elements#^1.0.5"})
    (hoplon :pretty-print true)
    (cljs   :optimizations :advanced :source-map true)
-   (serve
-      :handler 'lounge.api/app
-      :reload true
-      :port 3000)))
+   (serve :handler 'lounge.api/app :port 80)
+   (wait)))
