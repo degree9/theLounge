@@ -33,13 +33,6 @@
   '[jeluard.boot-notify :refer [notify]]
   '[degree9.boot-bower :refer [bower]])
 
-(swap! boot.repl/*default-dependencies*
-       concat '[[lein-light-nrepl "0.1.0"]
-                [org.clojure/clojurescript "1.7.48"]])
-
-(swap! boot.repl/*default-middleware*
-       conj 'lighttable.nrepl.handler/lighttable-ops)
-
 (deftask run-test
   "Test"
   []
@@ -65,6 +58,25 @@
     (notify)
     (speak)))
 
+(deftask docker
+  "Build theLounge for docker development."
+  []
+  (comp
+    (bower :directory "/polyelements"
+           :install {:iron-elements  "PolymerElements/iron-elements#^1.0.4"
+                     :paper-elements "PolymerElements/paper-elements#^1.0.5"
+                     :neon-elements "PolymerElements/neon-elements#^1.0.0"})
+    (watch)
+    (hoplon :pretty-print true)
+    (reload)
+    (cljs   :optimizations :none
+            :source-map    true)
+    (serve
+      :handler 'lounge.api/app
+      :reload true
+      :port 3000)
+    ))
+
 (deftask prod
   "Build theLounge for production deployment."
   []
@@ -73,4 +85,8 @@
    ;        :install {:iron-elements  "PolymerElements/iron-elements#^1.0.4"
    ;                  :paper-elements "PolymerElements/paper-elements#^1.0.5"})
    (hoplon :pretty-print true)
-   (cljs   :optimizations :advanced :source-map true)))
+   (cljs   :optimizations :advanced :source-map true)
+   (serve
+      :handler 'lounge.api/app
+      :reload true
+      :port 3000)))
