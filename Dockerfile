@@ -2,11 +2,9 @@ FROM adzerk/boot-clj:latest
 
 ENV BOOT_VERSION=2.4.2
 
-RUN apt-get update \
-    && apt-get install -y git curl
-
-# install npm
-RUN apt-get install -y npm
+# install node
+RUN curl --silent --location https://deb.nodesource.com/setup_0.12 | bash -
+RUN apt-get install -y nodejs
 RUN ln -s /usr/bin/nodejs /usr/bin/node
 
 # install bower
@@ -27,5 +25,3 @@ VOLUME ["/usr/src/d9lounge"]
 EXPOSE 80
 
 CMD ["boot" "prod"]
-
-
