@@ -38,8 +38,15 @@
   []
   clojure.core/identity)
 
+(deftask build
+  "Build theLounge for basic deployment"
+  []
+  (comp
+   (hoplon :pretty-print true)
+   (cljs   :optimizations :advanced :source-map true)))
+
 (deftask dev
-  "Build theLounge for local development within docker."
+  "Build theLounge for local development within Docker."
   []
   (comp
     (bower :install {:iron-elements  "PolymerElements/iron-elements#^1.0.4"
@@ -56,23 +63,16 @@
       :port 80)))
 
 (deftask dev-osx
-  "Build theLounge for local development."
+  "Build theLounge for local development on OS X."
   []
   (comp
     (dev)
     (notify)
     (speak)))
 
-(deftask build
-  "Build theLounge for basic deployment"
-  []
-  (comp
-   (hoplon :pretty-print true)
-   (cljs   :optimizations :advanced :source-map true)
-   (serve :handler 'lounge.api/app :port 80)
-   (wait)))
-
 (deftask prod
   "Build theLounge for production deployment."
-  []
-  (build))
+  [p port VAL int "Production Port number."]
+  (build)
+  (serve :handler 'lounge.api/app :port (or (:port *opts*) 80))
+  (wait))
