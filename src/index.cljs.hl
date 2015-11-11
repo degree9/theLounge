@@ -11,8 +11,8 @@
        (html-meta :http-equiv "Content-Type" :content "text/html; charset=UTF-8")
        (html-meta :name "viewport" :content "width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no")
        (link :href "https://fonts.googleapis.com/css?family=Roboto" :rel "stylesheet" :type "text/css")
-       (paper/import-elements "polyelements")
-       (neon/import-elements "polyelements")
+       (paper/import-elements)
+       (neon/import-elements)
        (title "Degree9"))
       (body :unresolved ""
        (ui/layout)

@@ -14,7 +14,7 @@
             [silicone.util :as silicone]))
 (compojure/defroutes app-routes
   (compojure/GET "/" req (hiccup/html [:head [:meta {:charset "utf-8"}]
-                                       (silicone/import-polymer "polyelements")]
+                                       (silicone/import-polymer "bower_components")]
                                       [:body [:script {:type "text/javascript" :src "index.html.js"}]]))
   (route/resources "/" {:root ""}))
 

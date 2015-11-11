@@ -2,6 +2,9 @@ FROM adzerk/boot-clj:latest
 
 ENV BOOT_VERSION=2.4.2
 
+# install git
+RUN apt-get install -y git
+
 # install node
 RUN curl --silent --location https://deb.nodesource.com/setup_0.12 | bash -
 RUN apt-get install -y nodejs
@@ -23,4 +26,4 @@ VOLUME ["/usr/src/d9lounge"]
 
 EXPOSE 80
 
-CMD ["boot" "prod"]
+CMD ["prod"]

@@ -33,7 +33,7 @@
                      :paper-toolbar
                      :paper-tooltip])
 
-(defn import-elements [path] (apply core/import-elements path paper-elements))
+(defn import-elements [& path] (apply core/import-elements paper-elements path))
 
 (def paper-badge               (core/elem-ctor "paper-badge"))
 (def paper-button              (core/elem-ctor "paper-button"))

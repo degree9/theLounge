@@ -29,7 +29,7 @@
                     :iron-validatable-behavior
                     :iron-validator-behavior])
 
-(defn import-elements [path] (apply core/import-elements path iron-elements))
+(defn import-elements [& path] (apply core/import-elements iron-elements path))
 
 (def iron-ajax              (core/elem-ctor "iron-ajax"))
 (def iron-autogrow-textarea (core/elem-ctor "iron-autogrow-textarea"))

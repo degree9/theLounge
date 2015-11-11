@@ -1,18 +1,6 @@
 web:
   build: .
-  command: 'boot serve -p $PORT -h lounge.api/app'
-  working_dir: /app/user
-  environment:
-    PORT: 8080
+  command: prod
+  working_dir: /usr/src/d9lounge
   ports:
-    - '8080:8080'
-shell:
-  build: .
-  command: bash
-  working_dir: /app/user
-  environment:
-    PORT: 8080
-  ports:
-    - '8080:8080'
-  volumes:
-    - '.:/app/user'
+    - '80:80'

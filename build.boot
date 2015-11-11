@@ -20,7 +20,7 @@
                   [ring/ring-defaults        "0.1.5"]
                   [ring-webjars              "0.1.1"]
                   [pandeiro/boot-http        "0.7.0-SNAPSHOT"]
-                  [degree9/boot-bower        "0.2.1"]]
+                  [degree9/boot-bower        "0.2.2"]]
  :source-paths   #{"src"}
  :asset-paths #{"resources/assets"})
 
@@ -42,10 +42,9 @@
   "Build theLounge for local development."
   []
   (comp
-    (bower :directory "/polyelements"
-           :install {:iron-elements  "PolymerElements/iron-elements#^1.0.4"
+    (bower :install {:iron-elements  "PolymerElements/iron-elements#^1.0.4"
                      :paper-elements "PolymerElements/paper-elements#^1.0.5"
-                     :neon-elements "PolymerElements/neon-elements#^1.0.0"})
+                     :neon-elements  "PolymerElements/neon-elements#^1.0.0"})
     (watch)
     (hoplon :pretty-print true)
     (reload)
@@ -54,16 +53,34 @@
     (serve
       :handler 'lounge.api/app
       :reload true
-      :port 3000)
+      :port 80)
     (notify)
     (speak)))
+
+(deftask dev-docker
+  "Build theLounge for local development within docker."
+  []
+  (comp
+    (bower :install {:iron-elements  "PolymerElements/iron-elements#^1.0.4"
+                     :paper-elements "PolymerElements/paper-elements#^1.0.5"
+                     :neon-elements  "PolymerElements/neon-elements#^1.0.0"})
+    (watch)
+    (hoplon :pretty-print true)
+    (reload)
+    (cljs   :optimizations :none
+            :source-map    true)
+    (serve
+      :handler 'lounge.api/app
+      :reload true
+      :port 80)))
 
 (deftask prod
   "Build theLounge for production deployment."
   []
   (comp
    (bower :install {:iron-elements  "PolymerElements/iron-elements#^1.0.4"
-                    :paper-elements "PolymerElements/paper-elements#^1.0.5"})
+                    :paper-elements "PolymerElements/paper-elements#^1.0.5"
+                    :neon-elements  "PolymerElements/neon-elements#^1.0.0"})
    (hoplon :pretty-print true)
    (cljs   :optimizations :advanced :source-map true)
    (serve :handler 'lounge.api/app :port 80)

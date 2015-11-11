@@ -3,7 +3,7 @@
 
 (def neon-elements [[:neon-animation :neon-animation]])
 
-(defn import-elements [path] (apply core/import-elements path neon-elements))
+(defn import-elements [& path] (apply core/import-elements neon-elements path))
 
 (def neon-animated-pages (core/elem-ctor "neon-animated-pages"))
 (def neon-animatable     (core/elem-ctor "neon-animated-pages"))
