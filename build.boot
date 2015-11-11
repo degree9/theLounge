@@ -1,6 +1,7 @@
 (set-env!
  :dependencies  '[[org.clojure/clojure       "1.7.0"]
                   [org.clojure/clojurescript "1.7.48"]
+                  [adzerk/bootlaces          "0.1.13" :scope "test"]
                   [adzerk/boot-cljs          "1.7.48-6"]
                   [adzerk/boot-cljs-repl     "0.1.10-SNAPSHOT"]
                   [adzerk/boot-reload        "0.3.3-SNAPSHOT"]
@@ -25,6 +26,7 @@
  :asset-paths #{"resources/assets"})
 
 (require
+  '[adzerk.bootlaces :refer :all]
   '[adzerk.boot-cljs :refer :all]
   '[adzerk.boot-cljs-repl :refer :all]
   '[adzerk.boot-reload :refer :all]
