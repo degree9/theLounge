@@ -1,1 +1,1 @@
-web: boot prod
+web: boot prod -p $PORT
