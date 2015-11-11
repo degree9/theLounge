@@ -67,9 +67,6 @@
   "Build theLounge for basic deployment"
   []
   (comp
-   (bower :install {:iron-elements  "PolymerElements/iron-elements#^1.0.4"
-                    :paper-elements "PolymerElements/paper-elements#^1.0.5"
-                    :neon-elements  "PolymerElements/neon-elements#^1.0.0"})
    (hoplon :pretty-print true)
    (cljs   :optimizations :advanced :source-map true)
    (serve :handler 'lounge.api/app :port 80)
