@@ -28,3 +28,7 @@
         )))
 
 (def app (handler "mongodb://flyboarder:17pali46@ds042908.mongolab.com:42908/thelounge"))
+
+(defn -main []
+  (run-jetty 'app {:port (System/getenv "PORT")}))
+

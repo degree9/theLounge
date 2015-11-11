@@ -33,6 +33,15 @@
   '[jeluard.boot-notify :refer [notify]]
   '[degree9.boot-bower :refer [bower]])
 
+(def +version+ "0.1.0")
+
+(task-options!
+  pom {:project 'degree9/thelounge
+       :version +version+
+       :description ""
+       :url         ""
+       :scm         {:url ""}})
+
 (deftask run-test
   "Test"
   []
@@ -43,7 +52,8 @@
   []
   (comp
    (hoplon :pretty-print true)
-   (cljs   :optimizations :advanced :source-map true)))
+   (cljs   :optimizations :advanced :source-map true)
+   (build-jar)))
 
 (deftask dev
   "Build theLounge for local development within Docker."
@@ -74,5 +84,4 @@
   "Build theLounge for production deployment."
   [p port VAL int "Production Port number."]
   (build)
-  (serve :handler 'lounge.api/app :port (or (:port *opts*) 80))
-  (wait))
+  )
