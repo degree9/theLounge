@@ -11,7 +11,7 @@ machine:
 
 test:
   override:
-    - ./boot run-test
+    - ./boot
 
 deployment:
   prod:

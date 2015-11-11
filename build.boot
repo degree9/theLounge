@@ -39,25 +39,6 @@
   clojure.core/identity)
 
 (deftask dev
-  "Build theLounge for local development."
-  []
-  (comp
-    (bower :install {:iron-elements  "PolymerElements/iron-elements#^1.0.4"
-                     :paper-elements "PolymerElements/paper-elements#^1.0.5"
-                     :neon-elements  "PolymerElements/neon-elements#^1.0.0"})
-    (watch)
-    (hoplon :pretty-print true)
-    (reload)
-    (cljs   :optimizations :none
-            :source-map    true)
-    (serve
-      :handler 'lounge.api/app
-      :reload true
-      :port 80)
-    (notify)
-    (speak)))
-
-(deftask dev-docker
   "Build theLounge for local development within docker."
   []
   (comp
@@ -74,8 +55,16 @@
       :reload true
       :port 80)))
 
-(deftask prod
-  "Build theLounge for production deployment."
+(deftask dev-osx
+  "Build theLounge for local development."
+  []
+  (comp
+    (dev)
+    (notify)
+    (speak)))
+
+(deftask build
+  "Build theLounge for basic deployment"
   []
   (comp
    (bower :install {:iron-elements  "PolymerElements/iron-elements#^1.0.4"
@@ -85,3 +74,8 @@
    (cljs   :optimizations :advanced :source-map true)
    (serve :handler 'lounge.api/app :port 80)
    (wait)))
+
+(deftask prod
+  "Build theLounge for production deployment."
+  []
+  (build))
