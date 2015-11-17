@@ -69,18 +69,17 @@
   "Build theLounge for local development. (within Docker)"
   []
   (comp
-    (bower :install {:iron-elements  "PolymerElements/iron-elements#^1.0.4"
-                     :paper-elements "PolymerElements/paper-elements#^1.0.5"
-                     :neon-elements  "PolymerElements/neon-elements#^1.0.0"})
+    ;(bower :install {:iron-elements  "PolymerElements/iron-elements#^1.0.4"
+    ;                 :paper-elements "PolymerElements/paper-elements#^1.0.5"
+    ;                 :neon-elements  "PolymerElements/neon-elements#^1.0.0"})
     (watch)
     (hoplon :pretty-print true)
-    (reload)
     (cljs   :optimizations :none
             :source-map    true)
     (serve
       :handler 'lounge.api/app
       :reload true
-      :port 80)))
+      :port 8000)))
 
 (deftask dev-osx
   "Build theLounge for local development on OS X."
@@ -93,5 +92,6 @@
 (deftask prod
   "Build theLounge for production deployment."
   [p port VAL int "Production Port number."]
+  (build)
   (run-jetty 'lounge.api/app {:port 8000})
   )

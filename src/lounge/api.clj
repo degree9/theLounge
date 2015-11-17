@@ -12,6 +12,8 @@
             [ring.middleware.webjars :refer [wrap-webjars]]
             [hiccup.core :as hiccup]
             [silicone.util :as silicone]))
+
+
 (compojure/defroutes app-routes
   (compojure/GET "/" req (hiccup/html [:head [:meta {:charset "utf-8"}]
                                        (silicone/import-polymer "bower_components")]
@@ -21,7 +23,6 @@
 (defn handler [dburi]
   (let [{:keys [conn db]} (mg/connect-via-uri dburi)]
     (-> app-routes
-        (wrap-webjars)
         (castra/wrap-castra 'lounge.api.auth)
         (wrap-session {:store (session-store db "sessions")})
         (mwdefaults/wrap-defaults mwdefaults/api-defaults)
@@ -31,5 +32,5 @@
 
 (defn -main []
   (let [port (Integer. (System/getenv "PORT"))]
-    (run-jetty 'app {:port port})))
+    (run-jetty app {:port port})))
 
