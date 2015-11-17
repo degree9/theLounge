@@ -59,7 +59,7 @@
    (hoplon :pretty-print true)
    (cljs   :optimizations :advanced)
    (pom)
-   (aot)
+   (aot :all)
    (uber)
    (jar)
    ))
