@@ -44,6 +44,7 @@
       :description ""
       :url         ""
       :scm {:url ""}}
+ aot {:namespace #{'lounge.api}}
  jar {:main 'lounge.api}
  )
 
@@ -59,7 +60,7 @@
    (hoplon :pretty-print true)
    (cljs   :optimizations :advanced)
    (pom)
-   (aot :all)
+   (aot)
    (uber)
    (jar)
    ))
