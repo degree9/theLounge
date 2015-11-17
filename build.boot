@@ -26,23 +26,26 @@
  :asset-paths #{"resources/assets"})
 
 (require
-  '[adzerk.bootlaces :refer :all]
-  '[adzerk.boot-cljs :refer :all]
-  '[adzerk.boot-cljs-repl :refer :all]
-  '[adzerk.boot-reload :refer :all]
-  '[pandeiro.boot-http :refer :all]
-  '[hoplon.boot-hoplon :refer :all]
-  '[jeluard.boot-notify :refer [notify]]
-  '[degree9.boot-bower :refer [bower]])
+ '[adzerk.bootlaces :refer :all]
+ '[adzerk.boot-cljs :refer :all]
+ '[adzerk.boot-cljs-repl :refer :all]
+ '[adzerk.boot-reload :refer :all]
+ '[pandeiro.boot-http :refer :all]
+ '[hoplon.boot-hoplon :refer :all]
+ '[jeluard.boot-notify :refer [notify]]
+ '[degree9.boot-bower :refer [bower]]
+ '[ring.adapter.jetty :refer [run-jetty]])
 
 (def +version+ "0.1.0")
 
 (task-options!
-  pom {:project 'degree9/thelounge
-       :version +version+
-       :description ""
-       :url         ""
-       :scm         {:url ""}})
+ pom {:project 'degree9/thelounge
+      :version +version+
+      :description ""
+      :url         ""
+      :scm {:url ""}}
+ jar {:main 'lounge.api}
+ )
 
 (deftask run-test
   "Test"
@@ -54,11 +57,15 @@
   []
   (comp
    (hoplon :pretty-print true)
-   (cljs   :optimizations :advanced :source-map true)
-   (build-jar)))
+   (cljs   :optimizations :advanced)
+   (pom)
+   (aot)
+   (uber)
+   (jar)
+   ))
 
 (deftask dev
-  "Build theLounge for local development within Docker."
+  "Build theLounge for local development. (within Docker)"
   []
   (comp
     (bower :install {:iron-elements  "PolymerElements/iron-elements#^1.0.4"
@@ -85,5 +92,5 @@
 (deftask prod
   "Build theLounge for production deployment."
   [p port VAL int "Production Port number."]
-  (build)
+  (run-jetty 'lounge.api/app {:port 8000})
   )

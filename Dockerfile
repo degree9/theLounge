@@ -18,7 +18,7 @@ COPY build.boot /usr/src/d9lounge/
 
 WORKDIR /usr/src/d9lounge
 
-RUN boot
+RUN boot build
 
 COPY . /usr/src/d9lounge
 
