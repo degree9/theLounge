@@ -1,4 +1,4 @@
-FROM degree9/heroku-boot-clj
+FROM degree9/heroku-boot-clj:latest
 
 ENV BOOT_VERSION=2.4.2
 

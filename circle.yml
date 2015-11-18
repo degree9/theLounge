@@ -1,20 +1,18 @@
-dependencies:
-  post:
-    - wget -O boot https://github.com/boot-clj/boot/releases/download/2.4.0/boot.sh
-    - chmod 755 boot
-    - ./boot -V
-    - ./boot checkout
-
 machine:
-  java:
-    version: oraclejdk8
+  services:
+    - docker
+
+dependencies:
+  override:
+    - docker info
+    - docker-compose build .
 
 test:
   override:
-    - ./boot
+    - docker-compose up shell boot run-test
 
 deployment:
   prod:
     branch: master
-    heroku:
-      appname: d9lounge
+    commands:
+      - heroku docker:release
