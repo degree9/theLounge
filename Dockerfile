@@ -12,18 +12,18 @@ RUN apt-get install -y nodejs
 # install bower
 RUN npm install --global bower
 
-RUN mkdir -p /usr/src/d9lounge
+RUN mkdir -p /app/user/d9lounge
 
-COPY build.boot /usr/src/d9lounge/
+COPY build.boot /app/user/d9lounge
 
-WORKDIR /usr/src/d9lounge
+WORKDIR /app/user/d9lounge
+
+RUN boot
+
+COPY . /app/user/d9lounge
 
 RUN boot build
 
-COPY . /usr/src/d9lounge
+VOLUME ["/app/user/d9lounge"]
 
-VOLUME ["/usr/src/d9lounge"]
-
-EXPOSE 80
-
-CMD ["prod"]
+EXPOSE 8080

@@ -1,6 +1,19 @@
 web:
   build: .
-  command: prod
-  working_dir: /usr/src/d9lounge
+  entrypoint: java
+  command: $JVM_OPTS -cp target/thelounge-0.1.0.jar clojure.main -m lounge.api
+  working_dir: /app/user/d9lounge
+  environment:
+    PORT: 8080
   ports:
-    - '80:80'
+    - '8080:8080'
+shell:
+  build: .
+  command: repl
+  working_dir: /app/user/d9lounge
+  environment:
+    PORT: 8080
+  ports:
+    - '8080:8080'
+  volumes:
+    - '.:/app/user/d9lounge'

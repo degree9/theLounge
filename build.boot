@@ -19,8 +19,8 @@
                   [jeluard/boot-notify       "0.2.0"]
                   [ring                      "1.4.0"]
                   [ring/ring-defaults        "0.1.5"]
-                  [ring-webjars              "0.1.1"]
                   [pandeiro/boot-http        "0.7.0-SNAPSHOT"]
+                  [org.clojars.hozumi/clj-commons-exec "1.2.0"]
                   [degree9/boot-bower        "0.2.2"]]
  :source-paths   #{"src"}
  :asset-paths #{"resources/assets"})
@@ -34,7 +34,8 @@
  '[hoplon.boot-hoplon :refer :all]
  '[jeluard.boot-notify :refer [notify]]
  '[degree9.boot-bower :refer [bower]]
- '[ring.adapter.jetty :refer [run-jetty]])
+ '[ring.adapter.jetty :refer [run-jetty]]
+ '[clj-commons-exec :as exec])
 
 (def +version+ "0.1.0")
 
@@ -48,30 +49,44 @@
  jar {:main 'lounge.api}
  )
 
+(deftask exec
+  "Apache Commons Exec wrapper task."
+  [c cmd CMD [str] "Cmd to exec with args."]
+  (let [cmd (or (:cmd *opts*) ["bash"])]
+    (with-pre-wrap fileset
+      (let [cmdresult @(exec/sh (into [] cmd))]
+        (assert (= 0 (:exit cmdresult)) (:err cmdresult)))
+      fileset)))
+
 (deftask run-test
   "Test"
   []
   clojure.core/identity)
 
+(deftask build-bower
+  "Fetch bower deps."
+  []
+  (bower :install {:iron-elements  "PolymerElements/iron-elements#^1.0.4"
+                    :paper-elements "PolymerElements/paper-elements#^1.0.6"
+                    :neon-elements  "PolymerElements/neon-elements#^1.0.0"}))
+
 (deftask build
   "Build theLounge for basic deployment"
   []
   (comp
+   (build-bower)
    (hoplon :pretty-print true)
    (cljs   :optimizations :advanced)
    (pom)
    (aot)
    (uber)
-   (jar)
-   ))
+   (jar)))
 
 (deftask dev
   "Build theLounge for local development. (within Docker)"
   []
   (comp
-    ;(bower :install {:iron-elements  "PolymerElements/iron-elements#^1.0.4"
-    ;                 :paper-elements "PolymerElements/paper-elements#^1.0.5"
-    ;                 :neon-elements  "PolymerElements/neon-elements#^1.0.0"})
+    (build-bower)
     (watch)
     (hoplon :pretty-print true)
     (cljs   :optimizations :none
@@ -88,10 +103,3 @@
     (dev)
     (notify)
     (speak)))
-
-(deftask prod
-  "Build theLounge for production deployment."
-  [p port VAL int "Production Port number."]
-  (build)
-  (run-jetty 'lounge.api/app {:port 8000})
-  )

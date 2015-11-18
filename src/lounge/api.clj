@@ -9,7 +9,6 @@
             [monger.core :as mg]
             [monger.ring.session-store :refer [session-store]]
             [castra.core :refer [ex]]
-            [ring.middleware.webjars :refer [wrap-webjars]]
             [hiccup.core :as hiccup]
             [silicone.util :as silicone]))
 
@@ -31,6 +30,6 @@
 (def app (handler "mongodb://flyboarder:17pali46@ds042908.mongolab.com:42908/thelounge"))
 
 (defn -main []
-  (let [port (Integer. (System/getenv "PORT"))]
+  (let [port (or (Integer. (System/getenv "PORT")) 8080)]
     (run-jetty app {:port port})))
 
