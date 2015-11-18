@@ -76,7 +76,8 @@
   (comp
    (build-bower)
    (hoplon :pretty-print true)
-   (cljs   :optimizations :advanced)
+   (cljs   :optimizations :none
+           :source-map true)
    (pom)
    (aot)
    (uber)
