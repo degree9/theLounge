@@ -1,4 +1,4 @@
-FROM adzerk/boot-clj:latest
+FROM degree9/heroku-boot-clj
 
 ENV BOOT_VERSION=2.4.2
 
@@ -18,9 +18,11 @@ COPY build.boot /app/user/d9lounge
 
 WORKDIR /app/user/d9lounge
 
-RUN boot
+COPY /resources /app/user/d9lounge
 
-COPY . /app/user/d9lounge
+RUN boot build-bower
+
+COPY /src /app/user/d9lounge
 
 RUN boot build
 
