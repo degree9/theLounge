@@ -17,4 +17,4 @@ deployment:
     branch: master
     commands:
       - heroku plugins:install heroku-docker
-      - heroku docker:release
+      - heroku docker:release --app d9lounge
