@@ -21,7 +21,7 @@
                   [ring/ring-defaults        "0.1.5"]
                   [pandeiro/boot-http        "0.7.0-SNAPSHOT"]
                   [org.clojars.hozumi/clj-commons-exec "1.2.0"]
-                  [degree9/boot-bower        "0.2.2"]]
+                  [degree9/boot-bower        "0.2.3"]]
  :source-paths   #{"src"}
  :asset-paths #{"resources/assets"})
 

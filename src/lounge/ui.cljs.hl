@@ -3,13 +3,28 @@
   (:require [lounge.state   :as state]
             [lounge.ui.drawer  :as drawer]
             [lounge.ui.content :as content]
-            [silicone.paper :as paper]))
+            [silicone.paper :as paper]
+            [silicone.neon :as neon]))
 
 (def layoutattr {:id "drawer-layout"
                  :force-narrow ""
                  :right-drawer (cell= (:right-drawer state/layout))})
 
+(def index
+  (html :lang "en"
+      (head
+       (title "Degree9")
+       (paper/import-elements)
+       (neon/import-elements)
+       )
+      (body :unresolved ""
+       (paper/paper-drawer-panel
+        layoutattr
+        (drawer/drawers)
+        (content/content)))))
+
 (defn reset-layout! []
+  ;;expand this to actually check if the drawer is open
   (-> js/document (.getElementById "drawer-layout") .closeDrawer))
 
 (cell= (when (:auth state/layout)
@@ -18,8 +33,3 @@
 (defn init []
   (content/activate-content))
 
-(defelem layout []
-  (paper/paper-drawer-panel
-   layoutattr
-   (drawer/drawers)
-   (content/content)))
