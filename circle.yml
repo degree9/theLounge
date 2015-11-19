@@ -1,18 +1,20 @@
 machine:
-  services:
-    - docker
+  java:
+    version: oraclejdk8
 
 dependencies:
-  override:
-    - docker info
-    - docker build -t d9lounge .
+  post:
+    - wget -O boot https://github.com/boot-clj/boot/releases/download/2.4.0/boot.sh
+    - chmod 755 boot
+    - ./boot -V
+    - ./boot build
 
 test:
   override:
-    - docker run -it d9lounge boot run-test
+    - ./boot run-test
 
 deployment:
-  prod:
+  production:
     branch: master
     commands:
       - heroku docker:release
