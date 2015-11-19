@@ -9,8 +9,6 @@ web:
     - '8080:8080'
 shell:
   build: .
-  entrypoint: boot
-  command: repl
   working_dir: /app/user
   environment:
     PORT: 8080
