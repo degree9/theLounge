@@ -5,11 +5,11 @@ machine:
 dependencies:
   override:
     - docker info
-    - docker-compose build
+    - docker build -t d9lounge .
 
 test:
   override:
-    - docker-compose up shell boot run-test
+    - docker run -it d9lounge boot run-test
 
 deployment:
   prod:
