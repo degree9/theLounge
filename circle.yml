@@ -16,4 +16,5 @@ deployment:
   production:
     branch: master
     commands:
+      - heroku plugins:install heroku-docker
       - heroku docker:release
