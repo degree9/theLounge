@@ -1,6 +1,4 @@
 (page "index.html"
       (:require [lounge.ui :as ui]))
 
-(ui/index)
-
 (ui/init)

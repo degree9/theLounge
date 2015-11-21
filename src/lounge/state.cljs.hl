@@ -3,13 +3,8 @@
             [lounge.state.auth :as auth])
   (:require-macros [javelin.core :refer [defc defc= cell=]]))
 
-(def layout  (cell= {:auth auth/authenticated?
-                     :right-drawer auth/unauthenticated?}))
-(def drawer  (cell= {:unauth auth/unauthenticated?}))
-(def content (cell= {}))
-(def toolbar (cell= {:auth-toolbar   auth/authenticated?
-                     :unauth-toolbar auth/unauthenticated?
-                     :drawer-toolbar auth/authenticated?}))
-(def routing (cell= {:hash route/route-hash}))
+(def user    (cell= {:auth   auth/authenticated?
+                     :unauth auth/unauthenticated?}))
+(def routing (cell= {:hash   route/route-hash}))
 
-(cell= (println layout drawer content toolbar routing))
+(cell= (println user routing))

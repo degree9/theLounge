@@ -1,35 +1,59 @@
 (ns lounge.ui
   (:refer-hoplon :exclude [header main])
   (:require [lounge.state   :as state]
-            [lounge.ui.drawer  :as drawer]
+            [lounge.drawer  :as drawer]
             [lounge.ui.content :as content]
+            [lounge.ui.toolbar :as toolbar]
             [silicone.paper :as paper]
             [silicone.neon :as neon]))
 
-(def layoutattr {:id "drawer-layout"
-                 :force-narrow ""
-                 :right-drawer (cell= (:right-drawer state/layout))})
+(def index-head
+  [(title "Degree9")
+   (paper/import-elements)
+   (neon/import-elements)])
+
+(def drawer-panel-attr
+  {:id "drawer-layout"
+   :force-narrow ""
+   :right-drawer (cell= (:auth state/user))})
+
+(def content-pages-attr
+  {:id "content-pages"
+   :entry-animation "slide-from-right-animation"
+   :exit-animation "slide-left-animation"
+   :attr-for-selected "route"
+   :selected (cell= (:hash state/routing))})
+
+(def content-pages
+  (neon/neon-animated-pages
+   content-pages-attr
+   (div :route "#!/home" (a :href "#!/nothome" "nothome!"))
+   (div :route "#!/nothome" (a :href "#!/home" "home!"))))
+
+(def index-body
+  (paper/paper-drawer-panel
+   drawer-panel-attr
+   (drawer/drawer)
+   (paper/paper-header-panel
+    {:main "" :mode "waterfall"}
+    (toolbar/toolbar :class {:paper-header true})
+    content-pages)))
 
 (def index
-  (html :lang "en"
-      (head
-       (title "Degree9")
-       (paper/import-elements)
-       (neon/import-elements)
-       )
-      (body :unresolved ""
-       (paper/paper-drawer-panel
-        layoutattr
-        (drawer/drawers)
-        (content/content)))))
+  (html {:lang "en"}
+   (head
+    index-head)
+   (body {:unresolved ""}
+    index-body)))
 
 (defn reset-layout! []
   ;;expand this to actually check if the drawer is open
   (-> js/document (.getElementById "drawer-layout") .closeDrawer))
 
-(cell= (when (:auth state/layout)
+(cell= (when (:auth state/user)
         (reset-layout!)))
 
 (defn init []
+  (index)
   (content/activate-content))
 

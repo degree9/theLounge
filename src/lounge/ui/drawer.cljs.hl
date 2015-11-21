@@ -1,5 +1,0 @@
-(ns lounge.ui.drawer
-  (:require [lounge.ui.drawer.auth :as auth]))
-
-(defn drawers []
-  (auth/auth-drawer))

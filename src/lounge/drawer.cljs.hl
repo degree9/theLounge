@@ -1,12 +1,13 @@
-(ns lounge.ui.drawer.core
-  (:require [lounge.state :as state]
+(ns lounge.drawer
+  (:require [lounge.drawer.auth :as auth]
             [silicone.paper :as paper]))
 
-(defelem drawer [attr & kids]
-  (let [id (:id attr)]
-    (paper/paper-header-panel
-     (merge {:drawer ""} attr)
-     kids)))
+(defn drawer []
+  (paper/paper-header-panel
+   (paper/paper-toolbar)
+   (div
+    {:style "padding: 24px;"}
+    (auth/authform))))
 
 (defelem drawer-toggle [attr & kids]
   (let [attr (merge {:icon "menu"
