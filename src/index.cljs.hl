@@ -1,4 +1,35 @@
 (page "index.html"
       (:require [lounge.ui :as ui]))
 
+<<<<<<< HEAD
+(html :lang "en"
+      (head
+       (html-meta :http-equiv "Content-Type" :content "text/html; charset=UTF-8")
+       (html-meta :name "viewport" :content "width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no")
+       ;(title "Parallax Template - Materialize")
+       ;(script :src "js/materialize.min.js")
+       (link :rel "stylesheet" :href "https://storage.googleapis.com/code.getmdl.io/1.0.4/material.blue_grey-indigo.min.css")
+       (script :src "https://storage.googleapis.com/code.getmdl.io/1.0.4/material.min.js")
+       (link :href "https://fonts.googleapis.com/icon?family=Material+Icons" :rel "stylesheet")
+       ;(link :rel "stylesheet" :href "https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/css/materialize.min.css")
+       ;(link :href "css/style.css" :type "text/css" :rel "stylesheet" :media "screen,projection")
+       )
+      (body
+       (layout/layout :header  (layout/layout-header :icon       (layout/icon)
+                                                     :title      (layout/title "Degree9")
+                                                     :navigation (layout/navigation
+                                                                  (layout/navigation-link :href "#" "test")))
+                      :drawer  [(lounge.layout/drawer-guest)
+                                (lounge.layout/drawer-user)]
+                      :content [(card/card :color "light-blue-darken-4"
+                                     (card/card-content "Hey There the first Setup Card!")
+                                     (card/card-action :hover)
+                                )
+                                (card/card :color "light-blue-darken-4"
+                                     (card/card-content "Hey There the second Setup Card!")
+                                     (card/card-action))
+                                ]
+                      )))
+=======
 (ui/init)
+>>>>>>> flyboarder/master

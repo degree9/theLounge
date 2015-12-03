@@ -1,4 +1,23 @@
 (set-env!
+<<<<<<< HEAD
+  :dependencies  '[[org.clojure/clojure       "1.7.0"]
+                   [org.clojure/clojurescript "1.7.48"]
+                   [adzerk/boot-cljs          "1.7.48-3"]
+                   [adzerk/boot-cljs-repl     "0.1.10-SNAPSHOT"]
+                   [adzerk/boot-reload        "0.3.2"]
+                   [pandeiro/boot-http        "0.6.3"]
+                   [hoplon/boot-hoplon        "0.1.7"]
+                   [hoplon/hoplon             "6.0.0-alpha10"]
+                   [hoplon/javelin            "3.8.2"]
+                   [jeluard/boot-notify       "0.2.0"]
+                   [boot/core                 "2.2.0"]
+                   [buddy                     "0.7.1"]
+                   [cljsjs/material           "1.0.4-0"]]
+
+  :source-paths   #{"src"}
+  :resource-paths #{"resources/assets"}
+  :target-path    "resources/public")
+=======
  :dependencies  '[[org.clojure/clojure       "1.7.0"]
                   [org.clojure/clojurescript "1.7.48"]
                   [adzerk/bootlaces          "0.1.13" :scope "test"]
@@ -24,6 +43,7 @@
                   [degree9/boot-bower        "0.2.3"]]
  :resource-paths   #{"src"}
  :asset-paths #{"resources/assets"})
+>>>>>>> flyboarder/master
 
 (require
  '[adzerk.bootlaces :refer :all]
