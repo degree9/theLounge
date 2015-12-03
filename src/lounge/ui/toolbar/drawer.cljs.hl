@@ -1,6 +1,0 @@
-(ns lounge.ui.toolbar.drawer
-  (:require [lounge.state :as state]
-            [lounge.drawer :as drawer]))
-
-(def drawer-toolbar
-  (drawer/drawer-toggle :toggle (cell= (:auth state/user))))
