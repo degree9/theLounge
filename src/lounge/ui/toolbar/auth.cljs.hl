@@ -1,0 +1,12 @@
+(ns lounge.ui.toolbar.auth
+  (:require [lounge.state :as state]
+            [lounge.state.auth :as auth]
+            [lounge.drawer :as drawer]
+            [silicone.paper :as paper]))
+
+(defn auth-toolbar []
+  (paper/paper-icon-button :icon "lock-open" :toggle (cell= (:auth state/user)) :click #(auth/unauth!)))
+
+(defn unauth-toolbar []
+  (drawer/drawer-toggle :icon "lock-outline" :toggle (cell= (:unauth state/user))))
+

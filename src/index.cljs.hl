@@ -1,12 +1,7 @@
 (page "index.html"
-      (:require [materialon.layout :as layout]
-                [materialon.card :as card]
-                [materialon.grid :as grid]
-                [materialon.navbar :as navbar]
-                [materialon.parallax :as parallax]
-                [cljsjs.material]
-                [lounge.layout]))
+      (:require [lounge.ui :as ui]))
 
+<<<<<<< HEAD
 (html :lang "en"
       (head
        (html-meta :http-equiv "Content-Type" :content "text/html; charset=UTF-8")
@@ -35,3 +30,6 @@
                                      (card/card-action))
                                 ]
                       )))
+=======
+(ui/init)
+>>>>>>> flyboarder/master

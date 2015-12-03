@@ -1,0 +1,12 @@
+(ns lounge.toolbar
+  (:require [lounge.ui.toolbar.auth :as auth]
+            [lounge.ui.toolbar.drawer :as drawer]
+            [silicone.paper :as paper]))
+
+(def toolbar
+  (paper/paper-toolbar
+   (drawer/drawer-toolbar)
+   (div :class {:flex true})
+   (auth/auth-toolbar)
+   (auth/unauth-toolbar)))
+

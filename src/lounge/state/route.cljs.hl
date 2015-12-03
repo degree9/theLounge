@@ -1,0 +1,14 @@
+(ns lounge.state.route
+  (:require [lounge.state.error   :refer [error]]
+            [lounge.state.loading :refer [loading]]
+            [javelin.core         :refer [cell with-let]]
+            [castra.core          :refer [mkremote]])
+  (:require-macros [javelin.core :refer [defc defc= cell=]]))
+
+;
+; uri-cell was inspired by hoplon.core/route-cell
+; (https://github.com/hoplon/hoplon/blob/master/src/hoplon/core.cljs#L588-L593)
+; expanded for some more info
+;
+
+(def route-hash (route-cell "#!/home"))

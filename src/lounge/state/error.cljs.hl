@@ -1,0 +1,11 @@
+(ns lounge.state.error
+  (:require [javelin.core :refer [cell]]
+            [castra.core  :refer [mkremote]])
+  (:require-macros [javelin.core :refer [defc defc= cell=]]))
+
+(defc error nil)
+
+(defc= error-message (when error (.-message error)))
+(defc= error-stack   (when error (.-serverStack error)))
+
+(cell= (println "[error]" error-message error error-stack))
