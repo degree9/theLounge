@@ -1,4 +1,4 @@
-(ns lounge.ui.toolbar
+(ns lounge.toolbar
   (:require [lounge.ui.toolbar.auth :as auth]
             [lounge.ui.toolbar.drawer :as drawer]
             [silicone.paper :as paper]))

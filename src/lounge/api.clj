@@ -19,15 +19,11 @@
                                       [:body [:script {:type "text/javascript" :src "index.html.js"}]]))
   (route/resources "/" {:root ""}))
 
-(defn handler [dburi]
-  (let [{:keys [conn db]} (mg/connect-via-uri dburi)]
-    (-> app-routes
+(def app
+  (-> app-routes
         (castra/wrap-castra 'lounge.api.auth)
-        (wrap-session {:store (session-store db "sessions")})
-        (mwdefaults/wrap-defaults mwdefaults/api-defaults)
-        )))
-
-(def app (handler "mongodb://flyboarder:17pali46@ds042908.mongolab.com:42908/thelounge"))
+        (castra/wrap-castra-session "a 16-byte secret")
+        (mwdefaults/wrap-defaults mwdefaults/api-defaults)))
 
 (defn -main [& args]
   (let [port (or (Integer. (System/getenv "PORT")) 8080)]

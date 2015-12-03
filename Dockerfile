@@ -9,8 +9,14 @@ RUN curl --silent --location https://deb.nodesource.com/setup_0.12 | bash - \
 # install bower
 RUN npm install --global bower
 
+# move boot files
 COPY build.boot /app/user
 
+COPY boot.properties /app/user
+
+RUN boot repl -e '(System/exit 0)'
+
+# move project files
 COPY . /app/user
 
 RUN boot build

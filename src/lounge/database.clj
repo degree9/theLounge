@@ -6,7 +6,7 @@
 
 (def dbconn (let [;uri (System/genenv "MONGO_URI")
                   ]
-              (mg/connect-via-uri "mongodb://flyboarder:17pali46@ds042908.mongolab.com:42908/thelounge")))
+              (mg/connect-via-uri "mongodb://lounge_db:27017")))
 
 (defn find-map [coll doc]
   (mc/find-one-as-map (:db dbconn) coll doc))

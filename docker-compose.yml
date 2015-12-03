@@ -7,12 +7,12 @@ web:
     PORT: 8080
   ports:
     - '8080:8080'
-shell:
-  build: .
-  working_dir: /app/user
-  environment:
-    PORT: 8080
+  links:
+    - db:lounge_db
+db:
+  image: mongo
   ports:
-    - '8080:8080'
+    - "27017:27017"
   volumes:
-    - '.:/app/user'
+    - /data/db
+  command: --smallfiles --rest

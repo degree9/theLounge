@@ -1,3 +1,0 @@
-(ns lounge.ui.content.core)
-
-;(defelem content-page [{route} & kids])

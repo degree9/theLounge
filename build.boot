@@ -22,7 +22,7 @@
                   [pandeiro/boot-http        "0.7.0-SNAPSHOT"]
                   [org.clojars.hozumi/clj-commons-exec "1.2.0"]
                   [degree9/boot-bower        "0.2.3"]]
- :source-paths   #{"src"}
+ :resource-paths   #{"src"}
  :asset-paths #{"resources/assets"})
 
 (require
@@ -67,17 +67,17 @@
   "Fetch bower deps."
   []
   (bower :install {:iron-elements  "PolymerElements/iron-elements#^1.0.4"
-                    :paper-elements "PolymerElements/paper-elements#^1.0.6"
-                    :neon-elements  "PolymerElements/neon-elements#^1.0.0"}))
+                   :paper-elements "PolymerElements/paper-elements#^1.0.6"
+                   :neon-elements  "PolymerElements/neon-elements#^1.0.0"}))
 
 (deftask build
   "Build theLounge for basic deployment"
   []
   (comp
    (build-bower)
-   (hoplon :pretty-print true)
+   (hoplon :pretty-print  true)
    (cljs   :optimizations :none
-           :source-map true)
+           :source-map    true)
    (pom)
    (aot)
    (uber)
@@ -89,13 +89,13 @@
   (comp
     (build-bower)
     (watch)
-    (hoplon :pretty-print true)
+    (hoplon :pretty-print  true)
     (cljs   :optimizations :none
             :source-map    true)
     (serve
       :handler 'lounge.api/app
       :reload true
-      :port 8000)))
+      :port 8080)))
 
 (deftask dev-osx
   "Build theLounge for local development on OS X."

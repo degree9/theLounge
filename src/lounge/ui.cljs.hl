@@ -2,10 +2,10 @@
   (:refer-hoplon :exclude [header main])
   (:require [lounge.state   :as state]
             [lounge.drawer  :as drawer]
-            [lounge.ui.content :as content]
-            [lounge.ui.toolbar :as toolbar]
+            [lounge.toolbar :as toolbar]
             [silicone.paper :as paper]
-            [silicone.neon :as neon]))
+            [silicone.neon :as neon]
+            [goog.dom]))
 
 (def index-head
   [(title "Degree9")
@@ -33,7 +33,7 @@
 (def index-body
   (paper/paper-drawer-panel
    drawer-panel-attr
-   (drawer/drawer)
+   drawer/drawer
    (paper/paper-header-panel
     {:main "" :mode "waterfall"}
     (toolbar/toolbar :class {:paper-header true})
@@ -46,6 +46,8 @@
    (body {:unresolved ""}
     index-body)))
 
+(def activate-content #(cell= (.setAttribute (goog.dom.getElement "content-pages") "selected" (:hash state/routing))))
+
 (defn reset-layout! []
   ;;expand this to actually check if the drawer is open
   (-> js/document (.getElementById "drawer-layout") .closeDrawer))
@@ -55,5 +57,5 @@
 
 (defn init []
   (index)
-  (content/activate-content))
+  (activate-content))
 
