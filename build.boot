@@ -3,7 +3,6 @@
                   [org.clojure/clojurescript "1.7.170"]
                   [adzerk/bootlaces          "0.1.13" :scope "test"]
                   [adzerk/boot-cljs          "1.7.170-3"]
-                  [adzerk/boot-reload        "0.4.2"]
                   [compojure                 "1.4.0"]
                   [com.cemerick/friend       "0.2.1"]
                   [com.novemberain/monger    "3.0.1"]
@@ -18,14 +17,20 @@
                   [ring/ring-defaults        "0.1.5"]
                   [pandeiro/boot-http        "0.7.0"]
                   [org.clojars.hozumi/clj-commons-exec "1.2.0"]
-                  [degree9/boot-bower        "0.2.3"]]
+                  [degree9/boot-bower        "0.2.3"]
+                  [degree9/lounge.api        "0.1.0"]
+                  [degree9/lounge.ui         "0.1.0"]
+                  [degree9/lounge.db         "0.1.0"]
+                  [degree9/lounge.drawer     "0.1.0"]
+                  [degree9/lounge.state      "0.1.0"]
+                  [degree9/lounge.toolbar    "0.1.0"]
+                  [degree9/silicone          "0.1.0"]]
  :resource-paths   #{"src"}
  :asset-paths #{"resources/assets"})
 
 (require
  '[adzerk.bootlaces :refer :all]
  '[adzerk.boot-cljs :refer :all]
- '[adzerk.boot-reload :refer :all]
  '[pandeiro.boot-http :refer :all]
  '[hoplon.boot-hoplon :refer :all]
  '[jeluard.boot-notify :refer [notify]]
