@@ -17,15 +17,24 @@
                   [ring/ring-defaults        "0.1.5"]
                   [pandeiro/boot-http        "0.7.0"]
                   [org.clojars.hozumi/clj-commons-exec "1.2.0"]
+                  [http-kit                  "2.1.19"]
+                  [cheshire                  "5.5.0"]
                   [degree9/boot-bower        "0.2.3"]
-                  [degree9/lounge.api        "0.1.0"]
-                  [degree9/lounge.ui         "0.1.0"]
-                  [degree9/lounge.db         "0.1.0"]
+                  [degree9/lounge.api        "0.2.0-SNAPSHOT"]
+                  [degree9/lounge.ui         "0.2.0-SNAPSHOT"]
+                  [degree9/lounge.pages      "0.1.0"]
+                  [degree9/lounge.org        "0.1.0"]
+                  [degree9/lounge.infra      "0.1.0"]
+                  [degree9/lounge.report     "0.1.0"]
                   [degree9/lounge.drawer     "0.1.0"]
-                  [degree9/lounge.state      "0.1.0"]
+                  [degree9/lounge.setup      "0.2.0-SNAPSHOT"]
+                  [degree9/lounge.state      "0.2.0-SNAPSHOT"]
                   [degree9/lounge.toolbar    "0.1.0"]
-                  [degree9/silicone          "0.1.0"]]
- :resource-paths   #{"src"}
+                  [degree9/lounge.workflow   "0.2.0-SNAPSHOT"]
+                  [degree9/silicone          "0.4.0-SNAPSHOT"]
+                  [degree9/lounge.boot       "0.3.0"  :scope "test"]
+                  [degree9/boot-semver       "1.2.0"  :scope "test"]]
+ :resource-paths #{"src"}
  :asset-paths #{"resources/assets"})
 
 (require
@@ -33,21 +42,18 @@
  '[adzerk.boot-cljs :refer :all]
  '[pandeiro.boot-http :refer :all]
  '[hoplon.boot-hoplon :refer :all]
- '[jeluard.boot-notify :refer [notify]]
+ '[boot-semver.core :refer :all]
+; '[jeluard.boot-notify :refer [notify]]
  '[degree9.boot-bower :refer [bower]]
  '[clj-commons-exec :as exec])
 
-(def +version+ "0.1.0")
-
 (task-options!
  pom {:project 'degree9/thelounge
-      :version +version+
       :description ""
       :url         ""
       :scm {:url ""}}
  aot {:namespace #{'lounge.api}}
- jar {:main 'lounge.api}
- )
+ jar {:main 'lounge.api})
 
 (deftask exec
   "Apache Commons Exec wrapper task."
@@ -63,44 +69,55 @@
   []
   clojure.core/identity)
 
-(deftask build-bower
+(deftask bower-deps
   "Fetch bower deps."
   []
-  (bower :install {:iron-elements  "PolymerElements/iron-elements#^1.0.4"
-                   :paper-elements "PolymerElements/paper-elements#^1.0.6"
-                   :neon-elements  "PolymerElements/neon-elements#^1.0.0"}))
+  (bower :install {:iron-elements  "PolymerElements/iron-elements#master"
+                   :paper-elements "PolymerElements/paper-elements#master"
+                   :neon-elements  "PolymerElements/neon-elements#master"}))
 
 (deftask build
-  "Build theLounge for basic deployment"
+  "Build theLounge for deployment"
   []
   (comp
-   (build-bower)
    (hoplon :pretty-print  true)
    (cljs   :optimizations :none
            :source-map    true)
+   (target :dir #{"target"})))
+
+(deftask pack
+  "Pack theLounge for deployment"
+  []
+  (comp
    (pom)
    (aot)
    (uber)
    (jar)))
 
 (deftask dev
-  "Build theLounge for local development. (within Docker)"
+  "Build theLounge for local development."
   []
   (comp
-    (build-bower)
-    (watch)
-    (hoplon :pretty-print  true)
-    (cljs   :optimizations :none
-            :source-map    true)
-    (serve
-      :handler 'lounge.api/app
-      :reload true
-      :port 8080)))
+   (build)
+   (serve :handler 'lounge.api/app
+          :reload true
+          :port 8080)))
 
 (deftask dev-osx
   "Build theLounge for local development on OS X."
   []
   (comp
-    (dev)
-    (notify)
-    (speak)))
+   (bower-deps)
+   (watch)
+   (dev)
+   ;(notify)
+   (speak)))
+
+(deftask prod
+  "Build theLounge for production deployment."
+  []
+  (comp
+   (bower-deps)
+   (build)
+   (version)
+   (pack)))

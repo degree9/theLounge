@@ -10,13 +10,15 @@ RUN curl --silent --location https://deb.nodesource.com/setup_0.12 | bash - \
 RUN npm install --global bower
 
 # move boot files
-COPY build.boot /app/user
-
 COPY boot.properties /app/user
+
+COPY build.boot /app/user
 
 RUN boot repl -e '(System/exit 0)'
 
 # move project files
-COPY . /app/user
+COPY /resources /app/user
 
-RUN boot build
+COPY /src /app/user
+
+RUN boot prod

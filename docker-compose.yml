@@ -8,7 +8,9 @@ web:
   ports:
     - '8080:8080'
   links:
+    - vault:lounge_vault
     - db:lounge_db
+
 db:
   image: mongo
   ports:
@@ -16,3 +18,14 @@ db:
   volumes:
     - /data/db
   command: --smallfiles --rest
+
+vault:
+  image: degree9/lounge-vault:latest
+  entrypoint: vault
+  command: server -config=/app/vault
+  environment:
+    VAULT_ADDR: http://0.0.0.0:8200
+  ports:
+    - "8200:8200"
+  volumes:
+    - /data/vault
