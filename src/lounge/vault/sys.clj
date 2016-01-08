@@ -1,8 +1,8 @@
 (ns lounge.vault.sys
-  (:require [lounge.api.core :as api]
-            [lounge.vault.core :as vault]
+  (:require [lounge.api.core    :as api]
+            [lounge.vault.core  :as vault]
             [org.httpkit.client :as http]
-            [cheshire.core :as json]))
+            [cheshire.core      :as json]))
 
 (def base-url          (clojure.string/join "/" [vault/api-url "sys"]))
 
