@@ -1,0 +1,25 @@
+(ns lounge.workflow
+  (:require [lounge.vault  :as vault]
+            [lounge.state  :as state]
+            [silicone.iron :as iron]
+            [silicone.neon :as neon]
+            [goog.dom]))
+
+(def flow-manager-attr
+  {:id "workflows"
+   :entry-animation "slide-from-right-animation"
+   :exit-animation "slide-left-animation"
+   :attr-for-selected "route"
+   :class [:fit]
+   :selected (cell= (if (not (:initialized vault/status))
+                      "#!/_setup"
+                      (:hash state/routing)))
+   })
+
+(defelem flow-manager [attr & kids]
+  (neon/neon-animated-pages (merge flow-manager-attr attr) kids))
+
+(defn flow [name & kids]
+  (div {:route (str "#!/" name)
+        :style "padding:0 16px;margin-left: auto;margin-right:auto;"
+        :class [:horizontal :layout :wrap :center-justified]} kids))
