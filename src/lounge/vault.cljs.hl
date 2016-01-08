@@ -1,0 +1,24 @@
+(ns lounge.vault
+  (:require [lounge.state.error   :refer [error]]
+            [lounge.state.loading :refer [loading]]
+            [javelin.core         :refer [cell]]
+            [castra.core          :refer [mkremote]])
+  (:require-macros [javelin.core :refer [defc defc= cell=]]))
+
+(def token  (cell nil))
+(def token? (cell= (not (nil? token))))
+
+(def status (cell {:initialized true
+                   :sealed false
+                   :standby false}))
+
+(def keyshards (cell nil))
+
+(def status?   (mkremote 'lounge.vault/status  status    error loading))
+(def init!     (mkremote 'lounge.vault/init    keyshards error loading))
+(def auth!     (mkremote 'lounge.vault/auth    token     error loading))
+(def auth?     (mkremote 'lounge.vault/is-auth token     error loading))
+(def unauth!   (mkremote 'lounge.vault/unauth  token     error loading))
+
+(cell= (println "[vault:token]"  token)
+       (println "[vault:status]" status))
