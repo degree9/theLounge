@@ -21,7 +21,7 @@
  [org.clojars.hozumi/clj-commons-exec "1.2.0"]
  [http-kit                  "2.1.19"]
  [cheshire                  "5.5.0"]
- [degree9/boot-bower        "0.2.3"]
+ [degree9/boot-bower        "0.3.0"]
  [degree9/lounge.api        "0.4.0"]
  [degree9/lounge.boot       "0.4.0"]
  [degree9/lounge.ui         "0.2.0"]
