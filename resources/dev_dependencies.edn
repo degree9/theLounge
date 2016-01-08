@@ -1,6 +1,5 @@
 [[degree9/lounge.api        "0.2.0-SNAPSHOT"]
  [degree9/lounge.ui         "0.2.0-SNAPSHOT"]
- [degree9/lounge.setup      "0.2.0-SNAPSHOT"]
  [degree9/lounge.state      "0.2.0-SNAPSHOT"]
  [degree9/lounge.pages      "0.2.0-SNAPSHOT"]
  [degree9/lounge.workflow   "0.2.0-SNAPSHOT"]

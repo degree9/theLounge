@@ -30,7 +30,7 @@
  [degree9/lounge.org        "0.1.0"]
  [degree9/lounge.infra      "0.1.0"]
  [degree9/lounge.report     "0.1.0"]
- [degree9/lounge.setup      "0.1.0"]
+ [degree9/lounge.setup      "0.2.0"]
  [degree9/lounge.state      "0.1.0"]
  ;[degree9/lounge.toolbar    "0.1.0"]
  [degree9/lounge.workflow   "0.1.0"]
