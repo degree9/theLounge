@@ -32,5 +32,5 @@
  [degree9/lounge.report     "0.1.0"]
  [degree9/lounge.setup      "0.2.0"]
  ;[degree9/lounge.toolbar    "0.1.0"]
- [degree9/silicone          "0.3.0"]
+ [degree9/silicone          "0.5.0"]
  [degree9/boot-semver       "1.2.0"]]
