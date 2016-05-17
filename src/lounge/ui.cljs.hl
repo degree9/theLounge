@@ -1,0 +1,103 @@
+(ns lounge.ui
+  (:refer-hoplon :exclude [header])
+  (:require [semantic-ui.core :as semui]
+            [semantic-ui.views.card :as semcard]
+            [semantic-ui.elements.container :as semcont]
+            [semantic-ui.elements.step :as steps]
+            [semantic-ui.elements.segment :as semseg]
+            [semantic-ui.collections.menu :as semmenu]
+            [semantic-ui.collections.grid :as semgrid]
+            [lounge.firebase :as fb]
+            [lounge.route :as route]))
+
+(defelem cards [attr kids]
+  (semcard/cards
+    (assoc attr :class (cell= {:center true
+                               :aligned true
+                               :centered (not (> (count kids) 3))
+                               :stackable true
+                               :link true
+                               :four (> (count kids) 3)
+                               }))
+    kids))
+
+(defelem segment-cards [attr kids]
+  (semseg/vertical-segment
+    attr
+    (cards kids)))
+
+(defelem row [attr kids]
+  (let [attr (assoc attr
+               :extends semgrid/row
+               :post-class [:animated :fadeIn])]
+    (semui/extelem attr kids)))
+
+(defelem card [attr kids]
+  (let [successc (:success attr)
+        infoc    (:info attr)
+        errorc   (:error attr)
+        warningc (:warning attr)]
+    (-> attr
+        (assoc :class (cell= {:green successc
+                              :blue infoc
+                              :red errorc
+                              :yellow warningc}))
+        (semcard/card kids))))
+
+(defelem header [attr _]
+  (row
+    attr
+    (semgrid/column
+      (img :class "ui centered medium image animated fadeIn" :src "images/logo.png" :click route/dash!))))
+
+(defelem form-column [attr kids]
+  (-> attr
+      (assoc :extends semgrid/column :post-class [:center :aligned] :style "width: 450px;")
+      (semui/extelem kids)))
+
+(defelem header-form [attr kids]
+  (semgrid/grid
+    (header)
+    (row (form-column kids))))
+
+(defelem logo [attr kids]
+  (semmenu/item
+    :class [:logo]
+    :toggle route/home?
+    (img :class (cell= {:ui true
+                        :small route/home?
+                        :image true}) :src "images/logo.png")))
+
+(defelem toolbar [attr kids]
+  (semmenu/menu
+    :class (cell= {:large route/home?
+                   :secondary route/home?
+                   :inverted route/home?
+                   :pointing route/home?
+                   :borderless (not route/home?)
+                   :fixed (not route/home?)})
+    (semcont/container
+      (logo)
+      (semmenu/right-item)
+      (div :toggle (cell= (not fb/isAuth?))
+           (semmenu/item
+             :click fb/auth-google!
+             (div :class [:ui :inverted :button]
+                  (i :class [:sign :in :icon])
+                  "Login")
+             (div :class [:ui :inverted :google :button]
+                  (i :class [:google :icon])
+                  "Sign Up with Google")))
+      (div :toggle (cell= (and fb/isAuth? (not route/dash?)))
+           (semmenu/item
+             :click #(route/dash!)
+             (div :class [:ui :inverted :button]
+                  (i :class [:sign :in :icon])
+                  "Open Dashboard")))
+      (div :toggle (cell= (and fb/isAuth? route/dash?))
+           (semmenu/item
+             :click #(fb/unauth!)
+             (div :class [:ui :basic :button]
+                  (i :class [:sign :out :icon])
+                  (span "Logout")))))))
+

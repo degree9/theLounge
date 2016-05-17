@@ -1,0 +1,121 @@
+(ns lounge.landing
+  (:require [semantic-ui.core :as semui]
+            [semantic-ui.elements.container :as semcont]
+            [semantic-ui.elements.step :as steps]
+            [semantic-ui.elements.segment :as semseg]
+            [semantic-ui.collections.menu :as semmenu]
+            [semantic-ui.collections.grid :as semgrid]
+            [lounge.firebase :as fb]
+            [lounge.forms :as forms]
+            [lounge.route :as route]
+            [lounge.ui :as ui]))
+
+(defelem banner [attr kids]
+  (semseg/vertical-segment
+    :class [:inverted :banner :center :aligned]
+    (semcont/container (ui/toolbar))
+    (semcont/container (h1 :class "ui inverted header" (span "Imagine IT...  ") (span :id "hype")))))
+
+(defelem intro [attr kids]
+  (semseg/vertical-segment
+    :class [:stripe]
+    (semcont/grid-container
+      :class [:middle :aligned :stackable]
+      (semgrid/column
+        :width 8
+        (h3 :class [:ui :header] "Manage your IT Automagically!")
+        (p "Using modern automation written in an AI language. Lisp.")
+        (h3 :class [:ui :header] "Where do you find your IT ninja's?")
+        (p "The internet, sleeping under desks and buried in parentheses.")
+        (h3 :class [:ui :header] "Actually?")
+        (p "Yep. Our solutions are Open-Source and community developed."
+           (br)(br)
+           "Because \"none of us is as smart as all of us.\""
+           (br)
+           "- Kenneth H. Blanchard"))
+      (semgrid/column
+        :class [:right :floated]
+        :width 6
+        (img :class "ui large rounded image" :src "images/wireframe/image.png")))))
+
+(defelem our-process [attr kids]
+  (let [togglec (cell true)]
+    (semseg/vertical-segment
+      :class [:stripe]
+      (semcont/container
+        :class [:center :aligned]
+        (h3 "How does this all work?")(br)
+        (semcont/text-container
+          (semmenu/menu
+            :class [:fluid :link :item]
+            (semmenu/item :class (cell= {:active togglec}) :click #(reset! togglec true) "Short answer!" )
+            (semmenu/item :class (cell= {:active (not togglec)}) :click #(reset! togglec false) "Long answer." )))
+        (br)(br)
+        (div
+          :toggle (cell= togglec)
+          (steps/steps
+            :class [:stackable]
+            (steps/step :icon "users"   :title "You!"      "Need simple and cost effective IT solutions.")
+            (steps/step :icon "desktop" :title "We."       "Build great solutions.")
+            (steps/step :icon "globe"   :title "Together!" "We move your business forward.")))
+        (div
+          :toggle (cell= (not togglec))
+          (steps/steps
+            :class [:stackable]
+            (steps/step :icon "cloud"     :title "We."          "Build integrations on top of existing clouds.")
+            (steps/step :icon "users"     :title "Communities." "Build great software.")
+            (steps/step :icon "lab"       :title "We."          "Automate this software on our cloud solutions.")
+            (steps/step :icon "dashboard" :title "You!"         "Get blinky status lights and buttons, which do all the work.")))))))
+
+(defelem devices-support-more [attr kids]
+  (let [togglec (cell :devices)]
+    (semseg/vertical-segment
+      :class [:stripe]
+      (semcont/container
+        :class [:center :aligned]
+        (h3 "What if I need more than just software?")(br)
+        (semcont/text-container
+          (semmenu/menu
+            :class [:fluid :link :item]
+            (semmenu/item :class (cell= {:active (= togglec :devices)})  :click #(reset! togglec :devices)  "Client Devices")
+            (semmenu/item :class (cell= {:active (= togglec :clouds)})   :click #(reset! togglec :clouds)   "Private Clouds")
+            (semmenu/item :class (cell= {:active (= togglec :support)})  :click #(reset! togglec :support)  "Support")
+            (semmenu/item :class (cell= {:active (= togglec :security)}) :click #(reset! togglec :security) "And more!")))
+        (br)(br)
+        (div
+          :toggle (cell= (= togglec :devices))
+          (steps/steps
+            :class [:stackable]
+            (steps/step :icon "desktop"   :title "Select Hardware." "Available from top brands.")
+            (steps/step :icon "lightning" :title "We."              "Provision and customize devices.")
+            (steps/step :icon "truck"     :title "Then."            "Equipment is sent to you!")
+            (steps/step :icon "laptop"    :title "You!"             "Get business ready quipment upon arrival!")))
+        (div
+          :toggle (cell= (= togglec :clouds))
+          (steps/steps
+            :class [:stackable]
+            (steps/step :icon "server"  :title "You." "Select your preferred cloud infrastructure.")
+            (steps/step :icon "options" :title "We."  "Provision and configure your platform.")
+            (steps/step :icon "rocket"  :title "You!" "Get your own on-premise full-stack cloud.")))
+        (div
+          :toggle (cell= (= togglec :support))
+          (steps/steps
+            :class [:stackable]
+            (steps/step :icon "life ring" :title "You."    "Select your level of support.")
+            (steps/step :icon "fire"      :title "Issues." "Get identified and reported.")
+            (steps/step :icon "doctor"    :title "We."     "Assign technicians to resolve the problem.")))
+        (div
+          :toggle (cell= (= togglec :security))
+          (steps/steps
+            :class [:stackable]
+            (steps/step :icon "camera"  :title "Video Surveillance." "Provides on-site security options.")
+            (steps/step :icon "server"  :title "Security Servers."   "Manage and store data for cameras and access control units.")
+            (steps/step :icon "protect" :title "Total."              "Infrastructure security in the Cloud and On-Premise.")))))))
+
+(defelem landing [attr kids]
+  (div
+    :toggle route/home?
+    (banner)
+    (intro)
+    (our-process)
+    (devices-support-more)))

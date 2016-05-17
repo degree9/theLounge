@@ -12,6 +12,8 @@ RUN npm install --global bower
 # move boot files
 COPY boot.properties /app/user
 
+COPY dependencies.edn /app/user
+
 COPY build.boot /app/user
 
 RUN boot repl -e '(System/exit 0)'

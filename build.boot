@@ -1,11 +1,14 @@
 (defn read-file   [file] (read-string (slurp file)))
-(defn get-deps    []     (read-file "./resources/dependencies.edn"))
-(defn get-devdeps []     (read-file "./resources/dev_dependencies.edn"))
+(defn get-deps    []     (read-file "./dependencies.edn"))
+(defn get-devdeps []     (read-file "./dev_dependencies.edn"))
 
 (set-env!
- :dependencies (get-deps)
- :resource-paths #{"src"}
- :asset-paths #{"resources"})
+ :dependencies   (get-deps)
+ ;:checkouts      (get-devdeps)
+ ;:source-paths   #{"resources/sass"}
+ :resource-paths #{"src" "resources/assets"}
+ ;:asset-paths    #{}
+  )
 
 (require
  '[adzerk.bootlaces :refer :all]
@@ -13,7 +16,7 @@
  '[pandeiro.boot-http :refer :all]
  '[hoplon.boot-hoplon :refer :all]
  '[boot-semver.core :refer :all]
-; '[jeluard.boot-notify :refer [notify]]
+ ; '[jeluard.boot-notify :refer [notify]]
  '[degree9.boot-bower :refer [bower]]
  '[clj-commons-exec :as exec]
  '[environ.boot :refer [environ]]
@@ -23,9 +26,7 @@
  pom {:project 'degree9/thelounge
       :description ""
       :url         ""
-      :scm {:url ""}}
- aot {:namespace #{'lounge.api}}
- jar {:main 'lounge.api})
+      :scm {:url ""}})
 
 (deftask exec
   "Apache Commons Exec wrapper task."
@@ -44,18 +45,23 @@
 (deftask bower-deps
   "Fetch bower deps."
   []
-  (bower :install {:iron-elements  "PolymerElements/iron-elements#master"
-                   :paper-elements "PolymerElements/paper-elements#master"
-                   :neon-elements  "PolymerElements/neon-elements#master"}))
+  (bower :install {:animate-css    "animate.css#master"
+                   :semantic-ui    "semantic-ui#next";"semantic-ui#2.1.8"
+                   :iron-elements  "PolymerElements/iron-elements#1.0.8"
+                   :paper-elements "PolymerElements/paper-elements#1.0.7"
+                   :neon-elements  "PolymerElements/neon-elements#1.0.0"}))
 
 (deftask build
   "Build theLounge for deployment"
   []
   (comp
-   (hoplon :pretty-print  true)
-   (cljs   :optimizations :none
-           :source-map    true)
-   (target :dir #{"target"})))
+   (hoplon :pretty-print   true)
+   (cljs   :optimizations  :none
+           :source-map     true
+           :compiler-options {:parallel-build true}
+           )
+   (target :dir #{"target"})
+   ))
 
 (deftask pack
   "Pack theLounge for deployment"
@@ -71,8 +77,7 @@
   []
   (comp
    (build)
-   (serve :handler 'lounge.api/app
-          :reload true
+   (serve :reload true
           :port 8080)))
 
 (deftask dev-osx

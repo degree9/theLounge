@@ -1,0 +1,137 @@
+(ns lounge.dash.advanced
+  (:require [semantic-ui.collections.form :as semform]
+            [semantic-ui.collections.grid :as semgrid]
+            [semantic-ui.collections.menu :as semmenu]
+            [semantic-ui.collections.message :as semmsg]
+            [semantic-ui.collections.table :as semtbl]
+            [semantic-ui.elements.container  :as semcont]
+            [semantic-ui.elements.header  :as semheader]
+            [semantic-ui.elements.segment :as semseg]
+            [lounge.ui :as ui]
+            [lounge.firebase :as fb]
+            [lounge.dash.cards :as cards]
+            [lounge.route :as route]))
+
+(defc= advanced? (and route/dash? (= (:type fb/tenant) "advanced") (:support fb/tenant)))
+
+(defelem org-home [attr kids]
+  (ui/segment-cards
+    :toggle route/org?
+    (cards/org-profile)
+    (cards/org-sites)
+    (cards/org-staff)))
+
+(defelem org-profile [attr kids]
+  (semseg/vertical-segment
+    :toggle route/org-profile?
+    (semgrid/grid
+      (ui/form-column
+        :class [:centered]
+        (semform/form :class [:large]
+          (semseg/segment
+            (div :class "field"
+                 (label "Tenant ID")
+                 (div :class "ui left icon input"
+                      (i :class "user icon")
+                      (input :type "text" :readonly true :value (cell= (:tenant fb/user)))))
+            ))))))
+
+(defelem org-staff [attr kids]
+  (semseg/vertical-segment
+    :toggle route/org-staff?
+    (semgrid/grid
+      (semgrid/column
+        :class [:left :aligned]
+        (semcont/text-container
+        (semmsg/message
+          :class [:top :attached]
+          (semheader/sub-h2 "Management Staff"))
+        (semtbl/table
+          :class [:attached]
+          (thead
+            (tr
+              (th (semheader/sub-h2 "ID"))
+              (th (semheader/sub-h2 "E-mail"))))
+          ;(tbody
+           ; (loop-tpl
+            ;  :bindings [[uid urole] (cell= (map #((key %) fb/users=) (:users fb/tenant)))]
+             ; (tr
+              ;  (td (str @uid))
+               ; (td @urole))))
+          ))))))
+
+(defelem dash-org [attr kids]
+  [(org-home)
+   (org-profile)
+   ;(org-sites)
+   (org-staff)])
+
+(defelem infra-home [attr kids]
+  (ui/segment-cards
+    :toggle route/infra?
+    (cards/infra-pub)
+    (cards/infra-priv)
+    (cards/infra-net)))
+
+(defelem infra-public [attr kids]
+  (ui/cards
+    :toggle route/infra-pub?
+    (cards/pub-azure)))
+
+(defelem infra-private [attr kids]
+  (ui/cards
+    :toggle route/infra-priv?
+    (cards/priv-azure)))
+
+
+(defelem infra-client [attr kids]
+  (ui/cards
+    ))
+
+(defelem dash-infra [attr kids]
+  [(infra-home)
+   (infra-public)
+   (infra-private)
+   ;(infra-client)
+   ])
+
+(defelem svc-home [attr kids]
+  (ui/segment-cards
+    :toggle route/svc?
+    (cards/domain-card)
+    (cards/email-card)
+    (cards/web-card)
+    (cards/ad-card)
+     (cards/ad-card)
+    ))
+
+(defelem dash-svc [attr kids]
+  [(svc-home)])
+
+(defelem support-home [attr kids]
+  (ui/segment-cards
+    :toggle route/support?))
+
+(defelem dash-support [attr kids]
+  [(support-home)])
+
+(defelem adv-home [attr kids]
+  (ui/segment-cards
+    (cards/org-card)
+    (cards/infra-card)
+    (cards/svc-card)
+    (cards/support-card)))
+
+(defelem dash [attr kids]
+  (semgrid/grid
+    :toggle advanced?
+    ;:scroll-to route/route
+    (ui/row
+      :class [:centered]
+      (semgrid/column
+        :class [:middle :aligned]
+        (adv-home)
+        (dash-org)
+        (dash-infra)
+        (dash-svc)
+        (dash-support)))))

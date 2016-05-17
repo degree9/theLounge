@@ -1,0 +1,122 @@
+{
+  "rules": {
+    "directory": {
+      ".validate": "newData.hasChildren()",
+      ".read": "auth != null",
+      "blocked": {
+        "$block": {
+          ".validate": "newData.isString() || newData.val() == null"
+        }
+      },
+      "tenants": {
+        "$tenant": {
+          ".validate": "newData.isString() || newData.val() == null"
+        }
+      },
+      "pending": {
+        "$tenant": {
+          ".validate": "newData.hasChildren() || newData.val() == null",
+          ".write": "data.val() == null && auth != null && data.val() == null"
+        }
+      }
+    },
+    "users": {
+      "$user": {
+        ".validate": "newData.hasChildren(['email', 'displayName', 'profileImageURL'])",
+        "email": {
+          ".validate": "newData.isString()"
+        },
+        "displayName": {
+          ".validate": "newData.isString()"
+        },
+        "profileImageURL": {
+          ".validate": "newData.isString()"
+        },
+        "enabled": {
+          ".validate": "newData.isBoolean() || newData.val() == null"
+        },
+        "tenant": {
+          ".validate": "newData.isString() || newData.val() == null"
+        },
+        "$other": {
+          ".validate": "false"
+        },
+        ".read": "auth != null && auth.uid == $user || auth != null && $user == 'default'",
+        ".write": "auth != null && auth.uid == $user",
+        "tenants": {
+          "$tenant": {
+            ".validate": "newData.isString() || newData.val() == null"
+          }
+        },
+        "notifications": {
+          "$notification": {
+            ".validate": "newData.hasChildren() || newData.val() == null"
+          }
+        }
+      }
+    },
+    "tenants": {
+      "$tenant": {
+        ".validate": "newData.hasChildren() && newData.hasChildren(['users']) || newData.val() == null",
+        "users": {
+          ".validate": "newData.hasChildren()"
+        },
+        "enabled": {
+          ".validate": "newData.isBoolean() || newData.val() == null"
+        },
+        "support": {
+          ".validate": "newData.isString() || newData.val() == null"
+        },
+        "type": {
+          ".validate": "newData.isString() || newData.val() == null"
+        },
+        "$other": {
+          ".validate": "false"
+        },
+        ".write": "data.val() == null && newData.child('users').child(auth.uid).val() != null || data.val() != null && newData.val() != null && data.child('users').child(auth.uid).val() != null",
+        ".read": "data.child('users').child(auth.uid).val() != null || auth != null && $tenant == 'default'",
+        "notifications": {
+          "$notification": {
+            ".validate": "newData.hasChildren() || newData.val() == null"
+          }
+        }
+      }
+    },
+    "settings": {
+      "$setting": {
+        ".validate": "newData.hasChildren() && newData.hasChildren(['enabled']) || newData.val() == null",
+        "enabled": {
+          ".validate": "newData.isBoolean()"
+        },
+        "$other": {
+          ".validate": "false"
+        },
+        ".read": "true"
+      }
+    },
+    "roles": {
+      "$role": {
+        ".validate": "newData.hasChildren() || newData.val() == null",
+        ".read": "true"
+      }
+    },
+    "billing": {
+      "$tenant": {
+        ".validate": "newData.hasChildren() && newData.hasChildren(['token', 'customer']) || newData.val() == null",
+        "token": {
+          ".validate": "newData.hasChildren()",
+          ".read": "auth != null && root.child('tenants').child($tenant).child('users').child(auth.uid).val() == 'owner'",
+          ".write": "auth != null && newData.parent().parent().parent().child('tenants').child($tenant).child('users').child(auth.uid).val() == 'owner'"
+        },
+        "customer": {
+          ".validate": "newData.hasChildren()",
+          ".read": "auth != null && root.child('tenants').child($tenant).child('users').child(auth.uid).val() == 'owner'",
+          ".write": "auth != null && newData.parent().parent().parent().child('tenants').child($tenant).child('users').child(auth.uid).val() == 'owner'"
+        },
+        "$other": {
+          ".validate": "false"
+        }
+      }
+    }
+  }
+}

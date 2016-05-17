@@ -1,0 +1,61 @@
+(ns lounge.forms
+  (:require [semantic-ui.elements.segment :as semseg]
+            [lounge.firebase :as fb]
+            [lounge.route :as route]
+            [lounge.stripe :as stripe]
+            [cljsjs.semantic-ui]
+            [clojure.string :as s]
+            [semantic-ui.core]
+            [ajax.core :refer [GET POST]]
+            [matchbox.core :as mbox]
+            [cognitect.transit :as t]))
+
+(defc tenantid nil)
+
+(defn tokenAccepted! [token]
+ ; (-> (fb/createTenant! @tenantid)
+  ;    (.then #(fb/setUser! (:uid @fb/user) "tenant" @tenantid))
+      ;(.then #(fb/updateToken! @tenantid (js->clj token)))
+      ;(.then #(fb/runRunbook "New-Tenant" (.stringify js/JSON #js{:tenantId @tenantid
+      ;                                                            :accessToken (:accessToken @fb/user)})))
+;      )
+)
+
+(defn tenant! [uid tid]
+  (-> (fb/create-tenant! tid)
+      (.then #(fb/update-user! uid {:tenant tid}))
+      (.catch #(.log js/console %))
+  ;(let []
+  ;  (stripe/stripe!)
+  ;  (.open @stripe/stripe #js{:token #(tokenAccepted! %)})
+))
+
+(defelem tenant [attr kids]
+  (form (assoc attr
+          :class "ui large form"
+          :id "tenant")
+        (div :class "ui top attached message"
+             (h3 :class [:ui :sub :header] "Please create a tenant id"))
+        (semseg/attached-segment
+          (div :class "field"
+               (div :class "ui left icon input"
+                    (i :class "user icon")
+                    (input :id "tenantid" :type "text" :placeholder "Tenant ID" :change #(reset! tenantid @%) @tenantid)))
+          (div :class "ui fluid large submit button" :tabindex "0" "Create Tenant!"))
+        (div :class "ui bottom attached error message")
+        ))
+
+(defn validate []
+  (.form (js/jQuery "#tenant")
+         (clj->js {:fields
+                   {:tenantid
+                    {:rules [{:type "empty"}
+                             {:type "minLength[4]"}
+                             {:type "maxLength[15]"}
+                             {:type "regExp[/^[a-z0-9]*$/]" :prompt "{name} must only contain lowercase letters and numbers."}
+                             {:type "fbtenant" :prompt "{name} {value} is unavailable."}]}}
+                   :onSuccess #(tenant! (:uid @fb/user) @tenantid)
+                   :on "change"
+                   :keyboardShortcuts false
+                   :rules {:fbtenant #();#(not (contains? @fb/tenants= (keyword %)))
+                           }})))

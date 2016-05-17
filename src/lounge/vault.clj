@@ -8,8 +8,8 @@
             [environ.core :refer [env]]
             [cemerick.friend.credentials :as creds]))
 
-(defn init! [keyshards minshards]
-  (let [res (sys/put-init {:body (json/generate-string {:secret_shares keyshards :secret_threshold minshards})})
+(defn init! [keyshares minshards]
+  (let [res (sys/put-init {:body (json/generate-string {:secret_shares keyshares :secret_threshold minshards})})
         res (-> res :body (json/parse-string true))]
     (swap! *session* assoc ::keys (:keys res))
     (swap! *session* assoc ::token (:root_token res))))
@@ -24,9 +24,9 @@
 (defn is-sealed? []
   (:sealed (get-sealstatus)))
 
-(defn unseal! [keyshards]
+(defn unseal! [keyshares]
   (let [unseal* #(-> (sys/put-unseal {:body (json/generate-string {:key %})}) :body (json/parse-string true))]
-    (doall (map #(if (is-sealed?) (unseal* %) (get-sealstatus)) (vec keyshards)))))
+    (doall (map #(if (is-sealed?) (unseal* %) (get-sealstatus)) (vec keyshares)))))
 
 (defn reg-rootadmin! [username password]
   (auth/post-userpass-users username {:body (json/generate-string {:password password :policies "root"})}))
@@ -59,11 +59,11 @@
   {:rpc/pre []}
   (-> (sys/get-health) :body (json/parse-string true)))
 
-(defrpc init [keyshardsnum keyshardsreq username pass confpass]
+(defrpc init [keysharesnum keysharesreq username pass confpass]
   {:rpc/pre [(api/assert (= pass confpass) "Passwords do not match.")
-             (api/assert (<= keyshardsreq keyshardsnum) "Cannot require more keyshards than creating.")
-             (init! keyshardsnum keyshardsreq)
-             (unseal! (take keyshardsreq (get-in @*session* [::keys])))
+             (api/assert (<= keysharesreq keysharesnum) "Cannot require more keyshares than creating.")
+             (init! keysharesnum keysharesreq)
+             (unseal! (take keysharesreq (get-in @*session* [::keys])))
              (enable-auth! "userpass")
              (reg-rootadmin! username pass)]}
   (get-in @*session* [::keys]))

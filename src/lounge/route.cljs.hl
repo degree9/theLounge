@@ -1,0 +1,232 @@
+(ns lounge.route
+  (:require [lounge.firebase :as fb]))
+
+(defn korks->str [& korks]
+  (let [korks (concat ["#"] (map #(-> % name str) korks))
+        korks (clojure.string/join "/" korks)
+        korks (clojure.string/replace korks "/*" "(?:/.*)*")]
+    korks))
+
+(korks->str :dash)
+
+(defn re-korks [& korks]
+  (re-pattern (apply korks->str korks)))
+
+;;Route Cell
+(def route
+  "Route cell which stays in sync with current URL hash."
+  (route-cell (korks->str :home)))
+
+(defn route!
+  "Change URL hash, does not reload the page."
+  [& route] (aset js/window "location" "hash" (apply korks->str route)))
+
+;;Home Route
+(defc= home?
+  "Home Route returns false if URL hash matches #home"
+  (or (not fb/isAuth?) (re-matches (re-korks :home) (str route))))
+
+(defc= not-home?
+  "Home Route returns true if URL hash matches #home"
+  (not home?))
+
+(def home!
+  "Changes URL hash to #home"
+  #(route! :home))
+
+;;Dashboard Routes
+(defc= dash?
+  "Returns true if URL hash matches #/dash/*"
+  (re-matches (re-korks :dash :*) (str route)))
+
+(defc= not-dash?
+  "Returns false if URL hash matches #/dash/*"
+  (not dash?))
+
+(def dash!
+  "Changes URL hash to #/dash"
+  #(route! :dash))
+
+;;Dashboard Organization Routes
+(defc= org?
+  "Returns true if URL hash matches #/dash/org/*"
+  (re-matches (re-korks :dash :org :*) (str dash?)))
+
+(defc= not-org?
+  "Returns false if URL hash matches #/dash/org/*"
+  (not org?))
+
+(def org!
+  "Changes URL hash to #/dash/org"
+  #(route! :dash :org))
+
+(defc= org-profile?
+  "Returns true if URL hash matches #/dash/org/profile/*"
+  (re-matches (re-korks :dash :org :profile) (str org?)))
+
+(defc= not-org-profile?
+  "Returns false if URL hash matches #/dash/org/profile/*"
+  (not org-profile?))
+
+(def org-profile!
+  "Changes URL hash to #/dash/org/profile"
+  #(route! :dash :org :profile))
+
+(defc= org-sites?
+  "Returns true if URL hash matches #/dash/org/sites/*"
+  (re-matches (re-korks :dash :org :sites) (str org?)))
+
+(defc= not-org-sites?
+  "Returns false if URL hash matches #/dash/org/sites/*"
+  (not org-sites?))
+
+(def org-sites!
+  "Changes URL hash to #/dash/org/sites"
+  #(route! :dash :org :sites))
+
+(defc= org-staff?
+  "Returns true if URL hash matches #/dash/org/staff/*"
+  (re-matches (re-korks :dash :org :staff) (str org?)))
+
+(defc= not-org-staff?
+  "Returns false if URL hash matches #/dash/org/staff/*"
+  (not org-staff?))
+
+(def org-staff!
+  "Changes URL hash to #/dash/org/staff"
+  #(route! :dash :org :staff))
+
+;;Dashboard Infrastructure Routes
+(defc= infra?
+  "Returns true if URL hash matches #/dash/infra/*"
+  (re-matches (re-korks :dash :infra :*) (str dash?)))
+
+(defc= not-infra?
+  "Returns false if URL hash matches #/dash/infra/*"
+  (not infra?))
+
+(def infra!
+  "Changes URL hash to #/dash/infra"
+  #(route! :dash :infra))
+
+(defc= infra-pub?
+  "Returns true if URL hash matches #/dash/infra/pub/*"
+  (re-matches (re-korks :dash :infra :pub :*)  (str infra?)))
+
+(defc= not-infra-pub?
+  "Returns false if URL hash matches #/dash/infra/pub/*"
+  (not infra-pub?))
+
+(def infra-pub!
+  "Changes URL hash to #/dash/infra/pub"
+  #(route! :dash :infra :pub))
+
+(defc= infra-priv?
+  "Returns true if URL hash matches #/dash/infra/priv/*"
+  (re-matches (re-korks :dash :infra :priv :*) (str infra?)))
+
+(defc= not-infra-priv?
+  "Returns false if URL hash matches #/dash/infra/priv/*"
+  (not infra-priv?))
+
+(def infra-priv!
+  "Changes URL hash to #/dash/infra/priv"
+  #(route! :dash :infra :priv))
+
+(defc= infra-net?
+  "Returns true if URL hash matches #/dash/infra/net/*"
+  (re-matches (re-korks :dash :infra :net :*) (str infra?)))
+
+(defc= not-infra-net?
+  "Returns false if URL hash matches #/dash/infra/net/*"
+  (not infra-net?))
+
+(def infra-net!
+  "Changes URL hash to #/dash/infra/net"
+  #(route! :dash :infra :net))
+
+;;Dashboard Service Routes
+(defc= svc?
+  "Returns true if URL hash matches #/dash/svc/*"
+  (re-matches (re-korks :dash :svc :*) (str route)))
+
+(defc= not-svc?
+  "Returns false if URL hash matches #/dash/svc/*"
+  (not svc?))
+
+(def svc!
+  "Changes URL hash to #/dash/svc"
+  #(route! :dash :svc))
+
+(defc= svc-domains?
+  "Returns true if URL hash matches #/dash/svc/domains/*"
+  (re-matches (re-korks :dash :svc :domains :*) (str svc?)))
+
+(defc= not-svc-domains?
+  "Returns false if URL hash matches #/dash/svc/domains/*"
+  (not svc?))
+
+(def svc-domains!
+  "Changes URL hash to #/dash/svc/domains"
+  #(route! :dash :svc :domains))
+
+(defc= svc-email?
+  "Returns true if URL hash matches #/dash/svc/email/*"
+  (re-matches (re-korks :dash :svc :email :*) (str svc?)))
+
+(defc= not-svc-email?
+  "Returns false if URL hash matches #/dash/svc/email/*"
+  (not svc-email?))
+
+(def svc-email!
+  "Changes URL hash to #/dash/svc/email"
+  #(route! :dash :svc :email))
+
+(defc= svc-web?
+  "Returns true if URL hash matches #/dash/svc/web/*"
+  (re-matches (re-korks :dash :svc :web :*) (str svc?)))
+
+(defc= not-svc-web?
+  "Returns false if URL hash matches #/dash/svc/web/*"
+  (not svc-web?))
+
+(def svc-web!
+  "Changes URL hash to #/dash/svc/web"
+  #(route! :dash :svc :web))
+
+;;Dashboard Support Routes
+(defc= support?
+  "Returns true if URL hash matches #/dash/support/*"
+  (re-matches (re-korks :dash :support :*) (str route)))
+
+(defc= not-support?
+  "Returns true if URL hash matches #/dash/support/*"
+  (not support?))
+
+(def support!
+  "Changes URL hash to #/dash/support"
+  #(route! :dash :support))
+
+;;User Account Route
+(defc= acct?
+  "Returns true if URL hash matches #acct/*"
+  (re-matches (re-korks :acct :*) (str route)))
+
+(def acct!
+  "Changes URL hash to #acct"
+  #(route! :acct))
+
+;Tenant Setup Route
+(defc= setup?
+  ""
+  (re-matches (re-korks :setup :*) (str route)))
+
+(def setup!
+  "Changes URL hash to #setup"
+  #(route! :setup))
+
+(defc= unknown? (when (not (or home? dash? setup?)) route))
+
+(defc= routes {:home home? :dash dash? :setup setup? :org org? :infra infra? :infra-pub infra-pub? :infra-priv infra-priv? :svc svc? :unknown unknown?})
+
+(cell= (prn "[routes]" routes))

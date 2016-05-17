@@ -1,0 +1,78 @@
+(ns lounge.dash.basic
+  (:require [semantic-ui.collections.grid :as semgrid]
+            [semantic-ui.collections.menu :as semmenu]
+            [semantic-ui.elements.segment :as semseg]
+            [lounge.ui :as ui]
+            [lounge.firebase :as fb]
+            [lounge.dash.cards :as cards]
+            [lounge.route :as route]))
+
+(defc= basic? (and route/dash? (= (:type fb/tenant) "basic")))
+
+(defelem basic-header [attr kids]
+  (let [menuc (cell :domain)]
+    [(semgrid/column
+       :width 4
+       (semmenu/vertical-tabular-menu
+         :class [:fluid]
+         (semmenu/item
+           :class (cell= {:link true :active (= menuc :domain)})
+           :click #(reset! menuc :domain)
+           "Domain Names")
+         (semmenu/item
+           :class (cell= {:link true :active (= menuc :email)})
+           :click #(reset! menuc :email)
+           "Email")
+         (semmenu/item
+           :class (cell= {:link true :active (= menuc :web)})
+           :click #(reset! menuc :web)
+           "Blogs & Websites")
+         (semmenu/item
+           :class (cell= {:link true :active (= menuc :more)})
+           :click #(reset! menuc :more)
+           "More...")))
+     (semgrid/column
+       :width 12
+       (div :class [:ui :info :message]
+            :toggle (cell= (= menuc :domain))
+            (h3 :class [:ui :sub :header] "A domain name is your name on the web.")
+            (br)
+            (ul :class [:list]
+                (li "This is the main way an organization is identified online")
+                (li "A domain name will often point to a website or blog")
+                (li "It is also used when contacting someone via email")))
+       (div :class [:ui :info :message :streched]
+            :toggle (cell= (= menuc :email))
+            (h3 :class [:ui :sub :header] "This is the most common way for someone to contact you online.")
+            (br)
+            (ul :class [:list]
+                (li "Once you have registered your domain name, you will be able to configure an email provider to use this name")
+                (li "This provider will host and manage email servers on your behalf")))
+       (div :class [:ui :info :message :streched]
+            :toggle (cell= (= menuc :web))
+            (h3 :class [:ui :sub :header] "Your content for the world to see.") (br)
+            (ul :class [:list]
+                (li "Blogs and websites are some of the more common ways to host your content online")))
+       (div :class [:ui :info :message :streched]
+            :toggle (cell= (= menuc :more))
+            (h3 :class [:ui :sub :header] "Full IT management available! Upgrade your account!") (br)
+            (ul :class [:list]
+                (li "Manage business applications, file servers and staff in the cloud.")
+                (li "Extend cloud infrastructure to local networks and client devices.")
+                (li "Secure your opperations with video surveillance and access control."))))]))
+
+(defelem basic-home [attr kids]
+  (ui/segment-cards
+    (cards/domain-card)
+    (cards/email-card)
+    (cards/web-card)))
+
+(defelem dash [attr kids]
+  (semgrid/grid
+    :toggle basic?
+    :scroll-to route/route
+    :class [:middle :aligned :centered]
+    (ui/row
+      (basic-header))
+    (ui/row
+      (basic-home))))

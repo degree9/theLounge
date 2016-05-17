@@ -1,9 +1,0 @@
-(ns lounge.state
-  (:require [lounge.state.route :as route]
-            [lounge.vault :as vault])
-  (:require-macros [javelin.core :refer [defc defc= cell=]]))
-
-
-(def routing (cell= {:hash   route/route-hash}))
-
-(cell= (println  routing ))

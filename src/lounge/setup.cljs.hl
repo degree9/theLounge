@@ -1,0 +1,185 @@
+(ns lounge.setup
+  (:require [semantic-ui.core :as semui]
+            [semantic-ui.views.card :as semcard]
+            [semantic-ui.elements.container :as semcont]
+            [semantic-ui.elements.step :as semsteps]
+            [semantic-ui.elements.segment :as semseg]
+            [semantic-ui.collections.menu :as semmenu]
+            [semantic-ui.collections.grid :as semgrid]
+            [lounge.ui :as ui]
+            [lounge.firebase :as fb]
+            [lounge.forms :as forms]
+            [lounge.route :as route]
+            [clojure.string :as s]))
+
+(defc= tenant?  (and fb/isAuth?
+                     (or route/setup?
+                         (nil? (:tenant fb/user)))))
+(cell= (prn tenant?))
+(defc= type?    (and fb/isAuth?
+                     (:tenant fb/user)
+                     (nil? (:type fb/tenant))))
+
+(defc= support? (and fb/isAuth?
+                     (= "advanced" (:type fb/tenant))
+                     (nil? (:support fb/tenant))))
+
+(defc= setup? (or tenant? type? support?))
+
+(defn type! [v]
+  (fb/update-tenant! (:tenant @fb/user) {:type v}))
+
+(defn support! [s]
+  (fb/update-tenant! (:tenant @fb/user) {:support s}))
+
+(defelem type-card [attr kids]
+  (semcard/card
+    (assoc attr
+      :click #(type! (s/lower-case (:id attr))))
+    (semcard/content
+      (i :class (:icon attr)))
+    (semcard/content
+      (semcard/content-header (:header attr)))
+    (semcard/content
+      (semcard/content-meta (:meta attr)))
+    (div :class [:ui (:msg-class attr) :message]
+         (div :class [:ui :sub :header] (:msg attr)))
+    kids))
+
+(defelem support-card [attr kids]
+  (semcard/card
+    (assoc attr
+      :click #(support! (s/lower-case (:id attr))))
+    (semcard/content
+      (i :class (:icon attr)))
+    (semcard/content
+      (semcard/content-header (:id attr))
+      (semcard/content-meta (:meta attr)))
+    (div :class [:ui (:msg-class attr) :message] (:msg attr))))
+
+(defelem setup-tenant [attr _]
+  (ui/row
+    attr
+    (ui/form-column
+      (forms/tenant))))
+
+(defelem setup-type [attr kids]
+  (ui/segment-cards
+    attr
+    (type-card
+      :id "basic"
+      :icon [:user :huge :icon]
+      :header "Individuals"
+      :meta (ul :class [:left :aligned]
+                (li "Build your web presence")
+                (li "Blogs, Domains and Email")
+                (li "Free Community Support!"))
+      :msg-class :info
+      :msg "Basic Management")
+    (type-card
+      :id "advanced"
+      :icon [:building :huge :icon]
+      :header "Organizations"
+      :meta (ul :class [:left :aligned]
+                (li "Manage Hybrid IT Cloud Solutions")
+                (li "Networks & Devices")
+                (li "Point of Sale"))
+      :msg-class :success
+      :msg "Complete Management")))
+
+(defelem setup-support [attr kids]
+  (ui/segment-cards
+    attr
+    (support-card
+      :id "Community"
+      :icon [:life :ring :huge :icon]
+      :meta "Self-Managed & Community Supported."
+      :msg-class :info
+      :msg "FREE Support")
+    (support-card
+      :id "Assisted"
+      :icon [:first :aid :huge :icon]
+      :meta "Self-Managed & Supported by Degree9."
+      :msg-class :success
+      :msg "$50/month/service")
+    (support-card
+      :id "Complete"
+      :icon [:hospital :outline :huge :icon]
+      :meta "Managed and Supported by Degree9."
+      :msg-class :warning
+      :msg "Starting at $500/month")))
+
+(defelem dash [attr kids]
+  (ui/row :class [:centered]
+    (setup-tenant :toggle tenant?)
+    (setup-type :toggle type?)
+    (setup-support :toggle support?)))
+
+;(defelem users-card [attr kids]
+;  (semcard/card
+;    (assoc attr
+;      :class (cell= {:green (= (:users attr) (:users setup))
+;                     :blue (not= (:users attr) (:users setup))}))
+;    (semcard/content
+;      (i :class (:icon attr)))
+;    (semcard/content
+;      (semcard/content-meta kids))))
+
+;(defelem cat-card [attr kids]
+;  (semcard/card
+;    (assoc attr
+;      :class (cell= {:green (= (:category attr) (:category setup))
+;                     :blue (not= (:category attr) (:category setup))}))
+;    (semcard/content
+;      (i :class (:icon attr)))
+;    (semcard/content
+;      (semcard/content-header (:category attr)))))
+
+
+
+
+;(defelem tenant-users [attr _]
+;  (semseg/basic-segment
+;    (assoc attr :class [:center :aligned])
+;    (semcard/cards
+;      :class [:centered :stackable :link]
+;      (users-card
+;        :users :small
+;        :icon [:user :huge :icon]
+;        "< 50 Employees")
+;      (users-card
+;        :users :medium
+;        :icon [:users :huge :icon]
+;        "> 50 Employees")
+;      (users-card
+;        :users :large
+;        :icon [:building :outline :huge :icon]
+;        "250+ Employees"))))
+
+;(defelem tenant-cat [attr _]
+;  (semseg/basic-segment
+;    (assoc attr :class [:center :aligned])
+;    (semcard/cards
+;      :class [:centered :stackable :link]
+;      (cat-card
+;        :category "Retail"
+;        :icon [:shop :huge :icon])
+;      (cat-card
+;        :category "Service"
+;        :icon [:options :huge :icon])
+;      (cat-card
+;        :category "Manufacturing"
+;        :icon [:wizard :huge :icon])
+;      (cat-card
+;        :category "Healthcare"
+;        :icon [:heartbeat :huge :icon])
+;      (cat-card
+;        :category "Education"
+;        :icon [:student :huge :icon])
+;      (cat-card
+;        :category "Government"
+;        :icon [:university :huge :icon])
+;      (cat-card
+;        :category "Other"
+;        :icon [:users :huge :icon]))))
+

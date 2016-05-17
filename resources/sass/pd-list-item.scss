@@ -1,0 +1,22 @@
+.pd-list-item a {
+  padding: 0.5em 1em 0.5em 3em;
+  display: inline-block;
+  width: 100%;
+  vertical-align: middle;
+  position: relative;
+  cursor:pointer;
+  box-sizing:border-box;
+}
+.pd-list-item iron-icon.iron-icon-0 {
+  position: absolute;
+  top: 0.5em;
+}
+.left iron-icon{
+  left: 1em;
+}
+.right iron-icon{
+  right: 0.5em;
+}
+.right a{
+  padding: 0.5em 2.5em 0.5em 1em;
+}

@@ -1,0 +1,95 @@
+isAuth() {auth != null}
+isCurrent(uid) {isAuth() && auth.uid == uid}
+isNull(in) {in == null}
+isDefault(in) {isAuth() && in == "default"}
+
+hasUser(tenant, uid) {tenant.users[uid] != null}
+
+roleOwner(tenant, uid)  {isAuth() && tenant.users[uid] == "owner"}
+roleGlobal(tenant, uid) {isAuth() && tenant.users[uid] == "global"}
+roleAdmin(tenant, uid)  {isAuth() && tenant.users[uid] == "admin"}
+roleUser(tenant, uid)   {isAuth() && tenant.users[uid] == "user"}
+roleHR(tenant, uid)     {isAuth() && tenant.users[uid] == "hr"}
+
+getUser(uid) {root.users[uid]}
+getTenant(id) {root.tenants[id]}
+getRole(id) {root.roles[id]}
+getSetting(id) {root.settings[id]}
+
+path /directory is Directory;
+path /directory/blocked/{block} is String | Null;
+path /directory/tenants/{tenant} is String | Null;
+path /directory/pending/{tenant} is DirectoryPending | Null;
+path /users/{user} is User;
+path /users/{user}/tenants/{tenant} is String | Null;
+path /users/{user}/notifications/{notification} is Notification | Null;
+path /tenants/{tenant} is Tenant | Null;
+path /tenants/{tenant}/notifications/{notification} is Notification | Null;
+path /settings/{setting} is Setting | Null;
+path /roles/{role} is Role | Null;
+path /billing/{tenant} is BillingTenant | Null;
+
+type Directory extends Object{
+
+  read() {isAuth()}
+}
+
+type DirectoryPending extends Object{
+
+  create() {isAuth() && isNull(prior(this))}
+}
+
+type User extends Object{
+  email: String,
+  displayName: String,
+  profileImageURL: String,
+  enabled: Boolean | Null,
+  tenant: String | Null
+
+  read()   {isCurrent(user) || isDefault(user)}
+  write()  {isCurrent(user)}
+}
+
+type Tenant extends Object{
+  users: Object,
+  enabled: Boolean | Null,
+  support: String | Null,
+  type: String | Null
+
+  read()   {hasUser(this, auth.uid) || isDefault(tenant)}
+  create() {hasUser(this, auth.uid)}
+  update() {hasUser(prior(this), auth.uid)}
+}
+
+type Notification extends Object {
+}
+
+type Setting extends Object{
+  enabled: Boolean
+
+  read()  {true}
+  write() {false}
+}
+
+type Role extends Object{
+
+  read()  {true}
+  write() {false}
+}
+
+type BillingTenant extends Object{
+  token: StripeToken,
+  customer: StripeCustomer
+}
+
+type StripeToken extends Object{
+
+  read()   {roleOwner(getTenant(tenant), auth.uid)}
+  write()  {roleOwner(getTenant(tenant), auth.uid)}
+}
+
+type StripeCustomer extends Object{
+
+  read()   {roleOwner(getTenant(tenant), auth.uid)}
+  write()  {roleOwner(getTenant(tenant), auth.uid)}
+}

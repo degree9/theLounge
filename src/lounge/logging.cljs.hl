@@ -1,0 +1,7 @@
+(ns lounge.logging
+  (:require [cljsjs.airbrake]))
+
+(def airbrake
+  (js/airbrakeJs.Client. #js{:projectId 123740
+                             :projectKey "8352ed6229595e3e62852369a997470f"}))
+

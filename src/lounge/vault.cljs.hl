@@ -1,24 +1,23 @@
 (ns lounge.vault
-  (:require [lounge.state.error   :refer [error]]
-            [lounge.state.loading :refer [loading]]
-            [javelin.core         :refer [cell]]
-            [castra.core          :refer [mkremote]])
-  (:require-macros [javelin.core :refer [defc defc= cell=]]))
+  (:require [castra.core :refer [mkremote]]))
 
-(def token  (cell nil))
-(def token? (cell= (not (nil? token))))
+(defc status         {:initialized false :sealed true :standby true})
+(defc token          nil)
+(defc keyshards      nil)
+(defc error          nil)
+(defc loading        nil)
 
-(def status (cell {:initialized true
-                   :sealed false
-                   :standby false}))
+(defc= init?         (:initialized status))
+(defc= sealed?       (:sealed      status))
+(defc= token-nil?    (nil? token))
+(defc= error-message (when error (.-message error)))
+(defc= error-stack   (when error (.-serverStack error)))
+(defc= loading?      (not (empty? (seq loading))))
 
-(def keyshards (cell nil))
+(def status!         (mkremote 'lounge.vault/status  status    error loading))
+(def init!           (mkremote 'lounge.vault/init    keyshards error loading))
+(def auth!           (mkremote 'lounge.vault/auth    token     error loading))
+(def unauth!         (mkremote 'lounge.vault/unauth  token     error loading))
 
-(def status?   (mkremote 'lounge.vault/status  status    error loading))
-(def init!     (mkremote 'lounge.vault/init    keyshards error loading))
-(def auth!     (mkremote 'lounge.vault/auth    token     error loading))
-(def auth?     (mkremote 'lounge.vault/is-auth token     error loading))
-(def unauth!   (mkremote 'lounge.vault/unauth  token     error loading))
-
-(cell= (println "[vault:token]"  token)
+(cell= (println "[vault:token]"  token token-nil?)
        (println "[vault:status]" status))

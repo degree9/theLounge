@@ -1,0 +1,65 @@
+  (html
+    (head
+      (html-meta :charset "utf-8")
+      (html-meta :http-equiv "X-UA-Compatible" :content "IE=edge,chrome=1")
+      (html-meta :name "viewport" :content "width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1")
+
+      (title "theLounge - Infrastructure Automation")
+      (semui/import-ui "bower_components")
+      (style ".last.container {
+             margin-bottom: 300px !important;
+             }
+             div.ui.center.header {
+             margin: 3em 0em;
+             }
+             div.ui.compact.menu {
+             margin: 2em 0em;
+             }
+             h3.ui.center.header {
+             padding: 2em 0em;}
+             "))
+    (body
+      (div :class "ui center aligned header"
+           (img :class "ui centered medium image" :src "images/logo.png"))
+      (div :class "ui container"
+           (div :class "ui stackable cards"
+           (a :class "ui centered card"
+                                  (div :class "ui image" (img :src "images/wireframe/image.png"))
+                                  (div :class "content"
+                                       (div :class "header" "I want to learn about the cloud!")
+                                       (div :class "meta" "F.A.Q")
+                                       (div :class "description" "Learn about cloud basics and elevate your business.")))
+           (a :class "ui centered card"
+                                  (div :class "ui image" (img :src "images/wireframe/image.png"))
+                                  (div :class "content"
+                                       (div :class "header" "I want to be on the cloud!")
+                                       (div :class "meta" "theLounge - IT as a Service")
+                                       (div :class "description" "Use Open-Source technologies to automate and run your business,
+                                            without IT Staff.")))
+           (a :class "ui centered card"
+                                  (div :class "ui image" (img :src "images/wireframe/image.png"))
+                                  (div :class "content"
+                                       (div :class "header" "I want my own cloud!")
+                                       (div :class "meta" "On-Premise Private and Hybrid Clouds")
+                                       (div :class "description" "Size and build your own On-Premise Cloud through our automated build system.")))))
+      (div :class "ui centered grid container"
+           (div :class "center aligned column"
+                (div :class "ui compact stackable menu"
+                     (div :class "item"
+                          (div :class "header" "Contact us about your IT needs. We are here to help!"))
+                     (a :class "ui icon item" :href "mailto:matt@degree9.io?Subject=Degree9%20Info"
+                          (i :class "mail icon"))
+                     (a :class "ui icon item" :href "tel:+1-780-666-4194"
+                          (i :class "phone icon"))
+                     (a :class "ui icon item" :href "https://twitter.com/degree9io"
+                          (i :class "twitter icon"))
+                     (a :class "ui icon item" :href "https://www.facebook.com/Degree9Solutions/"
+                          (i :class "facebook icon"))
+                     (a :class "ui icon item" :href "https://www.linkedin.com/company/degree9-solutions-inc."
+                          (i :class "linkedin icon")))))
+      (div :id "faq" :class "ui divider")
+      (div :class "ui centered equal width grid container"
+           (div :class "column"
+                (h2 "Who is the Cloud for?"))
+           (div :class "column")
+           )))

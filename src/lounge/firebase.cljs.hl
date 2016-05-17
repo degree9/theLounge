@@ -1,0 +1,124 @@
+(ns lounge.firebase
+  (:require [matchbox.core :as mbox]
+            [cljsjs.firebase]
+            [cljs.pprint :as p]
+            ;;
+            [matchbox.registry :as mreg]
+            [promesa.core :as prom]
+            [matchbox.promise :as mprom]))
+
+;;helper fn
+(defn fb->clj [fb]
+  (-> fb .val (js->clj :keywordize-keys true)))
+
+;;Firebase Root Ref
+(defc root nil)
+
+;;Firebase Tenant Directory
+(defc directory nil)
+
+;;Firebase User
+(defc user nil)
+
+(defn user! [udat]
+  (reset! user udat))
+
+(defn users [& korks]
+  (let [korks (into [:users] (mapv keyword korks))]
+    (mbox/get-in @root korks)))
+
+(defn listen-user!
+  ([uid]
+   (listen-user! uid #(user! (assoc (val %) :uid uid))))
+  ([uid cb]
+   (mbox/listen-to (users uid) :value cb))
+  ([uid korks cb]
+   (mbox/listen-to (users uid) korks :value cb)))
+
+;;Firebase Tenant
+(defc tenant nil)
+
+(defn tenant! [tdat]
+  (reset! tenant tdat))
+
+(defn tenants [& korks]
+  (let [korks (into [:tenants] (mapv keyword korks))]
+    (mbox/get-in @root korks)))
+
+(defn listen-tenant! [tid]
+  (mbox/listen-to (tenants tid) :value #(tenant! (assoc (val %) :id tid))))
+
+(defn listen-val!
+  ([ref cb]
+   (mbox/listen-to ref :value cb))
+  ([ref korks cb]
+   (mbox/listen-to ref korks :value cb)))
+
+(defn listen-directory! []
+  (listen-val! @root [:directory] #(reset! directory (val %))))
+
+(defn active-tenant! [uid]
+  (listen-user! uid [:tenant] #(if-let [tid (val %)]
+                                 (listen-tenant! (val %))
+                                 (reset! tenant nil))))
+
+(defn onAuth! [f] (mbox/onAuth @root f))
+
+(defn unauth! [] (mbox/unauth @root))
+
+(defn auth-google! []
+  (mbox/auth-with-oauth-popup @root "google" mbox/undefined {:scope "email"}))
+
+(defn update-user! [uid udat]
+  (mbox/merge! (users uid) (dissoc udat :uid) mbox/undefined))
+
+(defn update-tenant! [id tdat]
+  (mbox/merge! (tenants id) (dissoc tdat :id) mbox/undefined))
+
+;(defn updateToken! [id tdat]
+;  (-> (getToken id)
+;      (.update (clj->js tdat))))
+
+(defc= isAuth? (not (nil? user)))
+
+(defn create-tenant! [id]
+  (update-tenant! id {:enabled true
+                      :users {(keyword (:uid @user)) "global"}}))
+
+;(defn test-promise [_]
+;  (let []
+;    (-> (mprom/promise (tenants :demo))
+;        (prom/chain #(prn "res:" %))
+;        (prom/catch #(prn "rej:" %))
+;        ;(.then #(prn "res:" %))
+;        ;(.catch #(prn "rej:" %))
+;        )))
+
+(defn handleLogin! [auth]
+  (let [uid (:uid auth)
+        provider (-> auth :provider keyword)
+        udat (-> (provider auth)
+                 (dissoc :cachedUserProfile :id :accessToken))]
+    (listen-directory!)
+    (listen-user! uid)
+    (update-user! uid udat)
+    (active-tenant! uid)))
+
+(defn handleLogout! []
+  (dosync
+    (reset! user nil)
+    (reset! tenant nil)))
+
+(defn connect! [url]
+  (let []
+    (reset! root (mbox/connect url))
+    (onAuth! #(if-let [auth (js->clj % :keywordize-keys true)]
+                (handleLogin! auth)
+                (handleLogout!)))
+    ;(onAuth! test-promise)
+    ))
+
+(cell= (p/pprint root))
+(cell= (p/pprint directory))
+(cell= (p/pprint user))
+(cell= (p/pprint tenant))

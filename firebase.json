@@ -1,0 +1,9 @@
+{
+  "firebase": "d9lounge",
+  "public": "target",
+  "ignore": [
+    "firebase.json",
+    "**/.*",
+    "**/node_modules/**"
+  ]
+}

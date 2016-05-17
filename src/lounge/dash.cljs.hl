@@ -1,0 +1,22 @@
+(ns lounge.dash
+  (:refer-hoplon :exclude [menu main])
+  (:require [semantic-ui.elements.container :as semcont]
+            [lounge.ui :as ui]
+            [lounge.firebase :as fb]
+            [lounge.route :as route]
+            [lounge.setup :as setup]
+            [lounge.dash.advanced :as adv]
+            [lounge.dash.basic :as basic]))
+
+(defc= dash? (and fb/isAuth? route/dash?))
+
+(defelem dash [attr kids]
+  (semcont/grid-container
+    (assoc attr
+      :id "dash"
+      :toggle dash?)
+    (ui/toolbar)
+    (ui/header)
+    (setup/dash)
+    (basic/dash)
+    (adv/dash)))
