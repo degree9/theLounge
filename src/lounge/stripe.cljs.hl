@@ -2,7 +2,8 @@
 
 (defc stripe nil)
 
-(defn stripe! [] (reset! stripe (.configure js/StripeCheckout #js{:key "pk_test_6RoeyHPluqjmySZ7ZHzAJSPS"
-                                                                  :panelLabel "Subscribe"})))
-
-(cell= (prn "[stripe]" stripe))
+(defn stripe! []
+  (reset! stripe
+          (.configure js/StripeCheckout
+                      #js{:key "pk_test_6RoeyHPluqjmySZ7ZHzAJSPS"
+                          :panelLabel "Subscribe"})))

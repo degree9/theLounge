@@ -1,5 +1,6 @@
 (ns lounge.route
-  (:require [lounge.firebase :as fb]))
+  (:require [lounge.firebase :as fb]
+            [lounge.user :as user]))
 
 (defn korks->str [& korks]
   (let [korks (concat ["#"] (map #(-> % name str) korks))
@@ -24,7 +25,7 @@
 ;;Home Route
 (defc= home?
   "Home Route returns false if URL hash matches #home"
-  (or (not fb/isAuth?) (re-matches (re-korks :home) (str route))))
+  (or (not user/isAuth?) (re-matches (re-korks :home) (str route))))
 
 (defc= not-home?
   "Home Route returns true if URL hash matches #home"
@@ -229,4 +230,4 @@
 
 (defc= routes {:home home? :dash dash? :setup setup? :org org? :infra infra? :infra-pub infra-pub? :infra-priv infra-priv? :svc svc? :unknown unknown?})
 
-(cell= (prn "[routes]" routes))
+;(cell= (prn "[routes]" routes))

@@ -1,0 +1,48 @@
+(ns lounge.tenant
+  (:require [cljsjs.firebase]
+            [firebase-cljs.database :as fbdb]
+            [lounge.firebase :as fb]
+            [lounge.notifications :as notify]
+            [lounge.util :as util]))
+
+(defc tenant-fb nil)
+
+(defc tenant-default nil)
+
+(defc= tenant (when tenant-fb
+                (util/deep-merge tenant-default tenant-fb)))
+(cell= (prn "tenant" tenant))
+(def tenant-failure! #(notify/error! :user_permission "Permissions Error!" (str "You do not have permission to access Tenant ID: " %)))
+(def role-failure! #(notify/error! :role_error "Error!" (str "Unable to access role:" %)))
+
+(defn listen-tenant [tid state]
+  (fbdb/listen (fb/tenants) tid "value" #(reset! state (assoc (fb/fb->clj %) :id tid)) #(tenant-failure! tid)))
+
+(defn login [uid]
+  (listen-tenant "default" tenant-default))
+
+(defn logout []
+  (fbdb/disable-listener! (fb/tenants "default") "value")
+  (when @tenant
+    (fbdb/disable-listener! (fb/tenants (:id @tenant)) "value"))
+  (reset! tenant-fb nil)
+  (reset! tenant-default nil))
+
+(defn swap-tenant! [tid]
+  (let []
+    (when @tenant
+      (fbdb/disable-listener! (fb/tenants (:id @tenant)) "value"))
+    (listen-tenant tid tenant-fb)))
+
+(defn create-tenant! [uid tid]
+  (fbdb/reset! (fb/tenants tid) {:enabled true
+                                 :setup true
+                                 :users {(keyword uid) "basic"}}))
+
+(defn update-tenant! [tid tdat]
+  (fbdb/merge! (fb/tenants tid) (dissoc tdat :id)))
+
+(defn dissoc-tenant! [tid tkey]
+  (fbdb/remove! (fb/tenants tid [tkey])))
+
+

@@ -1,61 +1,79 @@
 (ns lounge.forms
-  (:require [semantic-ui.elements.segment :as semseg]
+  (:require [semantic-ui.core :as semui]
+            [semantic-ui.views.card :as semcard]
+            [semantic-ui.elements.button :as sembtn]
+            [semantic-ui.elements.container :as semcont]
+            [semantic-ui.elements.divider :as semdiv]
+            [semantic-ui.elements.header :as semhdr]
+            [semantic-ui.elements.image :as semimg]
+            [semantic-ui.elements.input :as seminpt]
+            [semantic-ui.elements.list :as semlist]
+            [semantic-ui.elements.step :as semsteps]
+            [semantic-ui.elements.segment :as semseg]
+            [semantic-ui.collections.menu :as semmenu]
+            [semantic-ui.collections.form :as semfrm]
+            [semantic-ui.collections.grid :as semgrid]
+            [semantic-ui.modules.modal :as modal]
+            [semantic-ui.modules.popup]
+            [semantic-ui.modules.progress :as semprog]
+            [semantic-ui.views.item :as semitm]
             [lounge.firebase :as fb]
+            [lounge.user :as user]
+            [lounge.tenant :as tenant]
+            [lounge.directory :as dir]
             [lounge.route :as route]
-            [lounge.stripe :as stripe]
-            [cljsjs.semantic-ui]
-            [clojure.string :as s]
-            [semantic-ui.core]
-            [ajax.core :refer [GET POST]]
-            [matchbox.core :as mbox]
-            [cognitect.transit :as t]))
+            [lounge.notifications :as notify]
+            [clojure.string :as s])
+  ;(:require-macros [lounge.forms :refer [defv defv= deferr deferr=]])
+  )
 
-(defc tenantid nil)
-
-(defn tokenAccepted! [token]
- ; (-> (fb/createTenant! @tenantid)
-  ;    (.then #(fb/setUser! (:uid @fb/user) "tenant" @tenantid))
-      ;(.then #(fb/updateToken! @tenantid (js->clj token)))
-      ;(.then #(fb/runRunbook "New-Tenant" (.stringify js/JSON #js{:tenantId @tenantid
-      ;                                                            :accessToken (:accessToken @fb/user)})))
-;      )
-)
-
-(defn tenant! [uid tid]
-  (-> (fb/create-tenant! tid)
-      (.then #(fb/update-user! uid {:tenant tid}))
-      (.catch #(.log js/console %))
-  ;(let []
-  ;  (stripe/stripe!)
-  ;  (.open @stripe/stripe #js{:token #(tokenAccepted! %)})
-))
-
-(defelem tenant [attr kids]
-  (form (assoc attr
-          :class "ui large form"
-          :id "tenant")
-        (div :class "ui top attached message"
-             (h3 :class [:ui :sub :header] "Please create a tenant id"))
-        (semseg/attached-segment
-          (div :class "field"
-               (div :class "ui left icon input"
-                    (i :class "user icon")
-                    (input :id "tenantid" :type "text" :placeholder "Tenant ID" :change #(reset! tenantid @%) @tenantid)))
-          (div :class "ui fluid large submit button" :tabindex "0" "Create Tenant!"))
-        (div :class "ui bottom attached error message")
-        ))
-
-(defn validate []
-  (.form (js/jQuery "#tenant")
-         (clj->js {:fields
-                   {:tenantid
-                    {:rules [{:type "empty"}
-                             {:type "minLength[4]"}
-                             {:type "maxLength[15]"}
-                             {:type "regExp[/^[a-z0-9]*$/]" :prompt "{name} must only contain lowercase letters and numbers."}
-                             {:type "fbtenant" :prompt "{name} {value} is unavailable."}]}}
-                   :onSuccess #(tenant! (:uid @fb/user) @tenantid)
-                   :on "change"
-                   :keyboardShortcuts false
-                   :rules {:fbtenant #();#(not (contains? @fb/tenants= (keyword %)))
-                           }})))
+(defelem user [attr kids]
+  (let []
+    (semfrm/form
+      (semseg/basic-segment
+        (semfrm/field
+          (label "Full Name")
+          (seminpt/icon-input
+            :class [:left]
+            (i :class [:user :icon])
+            (hoplon.core/input
+              :type "text"
+              :placeholder "Full Name"
+              :data-content "Please enter your full name."
+              :popup {:on "hover"}
+              :change #(user/assoc-user! :name @%)
+              :value (cell= (:name user/user)))))
+        (semfrm/field
+          (label "Email")
+          (seminpt/icon-input
+            :class [:left]
+            (i :class [:mail :icon])
+            (hoplon.core/input
+              :type "text"
+              :placeholder "Email"
+              :data-content "Please enter your email address."
+              :popup {:on "hover"}
+              :change #(user/assoc-user! :email @%)
+              :value (cell= (:email user/user)))))
+        (semfrm/field
+          (label "Phone Number")
+          (seminpt/icon-input
+            :class [:left]
+            (i :class [:phone :icon])
+            (hoplon.core/input
+              :type "text"
+              :placeholder "Phone Number"
+              :data-content "Please enter a number we can reach you at."
+              :popup {:on "hover"}
+              :change #(user/assoc-user! :phone @%)
+              :value (cell= (:phone user/user)))))
+        (sembtn/buttons
+          :buttons true
+          (sembtn/button
+            :class [:basic :red]
+            :click #(tenant/update-tenant! (:id @tenant/tenant) {:setup true})
+            "Cancel")
+          (sembtn/button
+            :class [:basic :green]
+            :click #(comp (prn "Submit!"))
+            "Submit"))))))

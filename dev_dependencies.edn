@@ -1,2 +1,5 @@
 [[degree9/semui-hl "0.9.0-SNAPSHOT"]
- [matchbox "0.0.10-SNAPSHOT"]]
+ [cljsjs/firebase "3.0.4-0"]
+ [degree9/firebase-cljs "0.2.0-SNAPSHOT"]
+  ;[matchbox "0.0.10-SNAPSHOT"]
+ ]

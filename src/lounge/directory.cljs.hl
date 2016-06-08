@@ -1,0 +1,16 @@
+(ns lounge.directory
+  (:require [cljsjs.firebase]
+            [lounge.firebase :as fb]))
+
+(defc directory-fb nil)
+
+(defc= directory directory-fb)
+
+(defc= dir-tenants (into #{} (:tenants directory)))
+
+(defc= dir-blocked (into #{} (:blocked directory)))
+
+(defc= dir-pending (into #{} (:pending directory)))
+
+(defn listen-dir [state]
+  (fb/listen-val (fb/directory) state))

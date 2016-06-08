@@ -1,0 +1,9 @@
+(ns lounge.util)
+
+;; Should be in clojure.core
+(defn deep-merge
+  "Like merge, but merges maps recursively."
+  [& maps]
+  (cond (every? map? maps) (apply merge-with deep-merge maps)
+        (nil? (last maps)) (apply deep-merge (butlast maps))
+        :else (last maps)))

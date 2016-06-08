@@ -1,14 +1,23 @@
 (ns lounge.dash
   (:refer-hoplon :exclude [menu main])
-  (:require [semantic-ui.elements.container :as semcont]
+  (:require [semantic-ui.core :as semui]
+            [semantic-ui.views.card :as semcard]
+            [semantic-ui.elements.button :as sembtn]
+            [semantic-ui.elements.container :as semcont]
+            [semantic-ui.elements.divider :as semdiv]
+            [semantic-ui.elements.step :as semsteps]
+            [semantic-ui.elements.segment :as semseg]
+            [semantic-ui.collections.menu :as semmenu]
+            [semantic-ui.collections.grid :as semgrid]
             [lounge.ui :as ui]
+            [lounge.dash.navigation :as nav]
             [lounge.firebase :as fb]
             [lounge.route :as route]
+            [lounge.user :as user]
             [lounge.setup :as setup]
-            [lounge.dash.advanced :as adv]
-            [lounge.dash.basic :as basic]))
+            [lounge.notifications :as notify]))
 
-(defc= dash? (and fb/isAuth? route/dash?))
+(defc= dash? (and user/isAuth? route/dash?))
 
 (defelem dash [attr kids]
   (semcont/grid-container
@@ -17,6 +26,8 @@
       :toggle dash?)
     (ui/toolbar)
     (ui/header)
+    (notify/dash)
     (setup/dash)
-    (basic/dash)
-    (adv/dash)))
+    (setup/wizard)
+    (nav/dash)
+    ))

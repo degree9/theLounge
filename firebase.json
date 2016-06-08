@@ -1,9 +1,14 @@
 {
-  "firebase": "d9lounge",
-  "public": "target",
-  "ignore": [
-    "firebase.json",
-    "**/.*",
-    "**/node_modules/**"
-  ]
+  "hosting": {
+    "public": "target",
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "database": {
+    "rules": "src/rules.bolt"
+  }
 }

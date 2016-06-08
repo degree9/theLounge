@@ -1,4 +1,4 @@
-(ns lounge.dash.advanced
+(ns lounge.dash.navigation
   (:require [semantic-ui.collections.form :as semform]
             [semantic-ui.collections.grid :as semgrid]
             [semantic-ui.collections.menu :as semmenu]
@@ -9,10 +9,12 @@
             [semantic-ui.elements.segment :as semseg]
             [lounge.ui :as ui]
             [lounge.firebase :as fb]
+            [lounge.user :as user]
+            [lounge.tenant :as tenant]
             [lounge.dash.cards :as cards]
             [lounge.route :as route]))
 
-(defc= advanced? (and route/dash? (= (:type fb/tenant) "advanced") (:support fb/tenant)))
+;(defc= advanced? (and route/dash? (= (:type fb/tenant) "advanced") (:support fb/tenant)))
 
 (defelem org-home [attr kids]
   (ui/segment-cards
@@ -33,7 +35,7 @@
                  (label "Tenant ID")
                  (div :class "ui left icon input"
                       (i :class "user icon")
-                      (input :type "text" :readonly true :value (cell= (:tenant fb/user)))))
+                      (input :type "text" :readonly true :value (cell= (:id tenant/tenant)))))
             ))))))
 
 (defelem org-staff [attr kids]
@@ -124,7 +126,7 @@
 
 (defelem dash [attr kids]
   (semgrid/grid
-    :toggle advanced?
+    :toggle (cell= (and tenant/tenant (not (:setup tenant/tenant))))
     ;:scroll-to route/route
     (ui/row
       :class [:centered]

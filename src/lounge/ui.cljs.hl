@@ -3,11 +3,14 @@
   (:require [semantic-ui.core :as semui]
             [semantic-ui.views.card :as semcard]
             [semantic-ui.elements.container :as semcont]
+            [semantic-ui.elements.button :as sembtn]
             [semantic-ui.elements.step :as steps]
             [semantic-ui.elements.segment :as semseg]
             [semantic-ui.collections.menu :as semmenu]
             [semantic-ui.collections.grid :as semgrid]
+            [semantic-ui.modules.popup]
             [lounge.firebase :as fb]
+            [lounge.user :as user]
             [lounge.route :as route]))
 
 (defelem cards [attr kids]
@@ -70,34 +73,49 @@
 
 (defelem toolbar [attr kids]
   (semmenu/menu
-    :class (cell= {:large route/home?
+    :class (cell= {:small (not route/home?)
+                   :large route/home?
                    :secondary route/home?
                    :inverted route/home?
                    :pointing route/home?
-                   :borderless (not route/home?)
+                   ;:borderless (not route/home?)
                    :fixed (not route/home?)})
-    (semcont/container
-      (logo)
-      (semmenu/right-item)
-      (div :toggle (cell= (not fb/isAuth?))
+    (logo)
+    (semmenu/right-item
+      (div :toggle (cell= (and user/isAuth? route/dash?))
+           (sembtn/icon-button
+             :class [:basic]
+             :data-content "Tooltips are in the format: [description][: example]"
+             :popup {:on "hover"}
+             (i :class [:help :icon]))
+           (sembtn/icon-button
+             :class [:basic]
+             :data-content "Make a wish!"
+             :popup {:on "hover"}
+             (i :class [:star :icon]))))
+    (semmenu/item
+      (div :toggle (cell= (not user/isAuth?))
            (semmenu/item
-             :click fb/auth-google!
+             :click #(comp (fb/login!) (route/dash!))
              (div :class [:ui :inverted :button]
                   (i :class [:sign :in :icon])
                   "Login")
              (div :class [:ui :inverted :google :button]
                   (i :class [:google :icon])
                   "Sign Up with Google")))
-      (div :toggle (cell= (and fb/isAuth? (not route/dash?)))
+      (div :toggle (cell= (and user/isAuth? (not route/dash?)))
            (semmenu/item
-             :click #(route/dash!)
+             :click route/dash!
              (div :class [:ui :inverted :button]
                   (i :class [:sign :in :icon])
                   "Open Dashboard")))
-      (div :toggle (cell= (and fb/isAuth? route/dash?))
-           (semmenu/item
-             :click #(fb/unauth!)
-             (div :class [:ui :basic :button]
-                  (i :class [:sign :out :icon])
-                  (span "Logout")))))))
+      (div :toggle (cell= (and user/isAuth? route/dash?))
+           (sembtn/icon-button
+             :class [:basic]
+             :data-content "Bye!"
+             :popup {:on "hover"}
+             :click fb/logout!
+             (i :class [:sign :out :icon])
+             (span "Logout")))
+      )))
 

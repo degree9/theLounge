@@ -1,36 +1,48 @@
 (ns lounge.setup
+  (:refer-hoplon :exclude [form])
   (:require [semantic-ui.core :as semui]
             [semantic-ui.views.card :as semcard]
+            [semantic-ui.elements.button :as sembtn]
             [semantic-ui.elements.container :as semcont]
+            [semantic-ui.elements.divider :as semdiv]
+            [semantic-ui.elements.header :as semhdr]
+            [semantic-ui.elements.image :as semimg]
+            [semantic-ui.elements.input :as seminpt]
+            [semantic-ui.elements.list :as semlist]
             [semantic-ui.elements.step :as semsteps]
             [semantic-ui.elements.segment :as semseg]
             [semantic-ui.collections.menu :as semmenu]
+            [semantic-ui.collections.form :as semfrm]
             [semantic-ui.collections.grid :as semgrid]
+            [semantic-ui.modules.popup]
+            [semantic-ui.modules.modal :as modal]
+            [semantic-ui.modules.progress :as semprog]
+            [semantic-ui.views.item :as semitm]
             [lounge.ui :as ui]
             [lounge.firebase :as fb]
+            [lounge.user :as user]
+            [lounge.tenant :as tenant]
+            [lounge.directory :as dir]
             [lounge.forms :as forms]
             [lounge.route :as route]
-            [clojure.string :as s]))
+            [lounge.notifications :as notify]
+            [clojure.string :as s])
+  (:require-macros [lounge.forms :refer [defv defv= deferr deferr=]]))
 
-(defc= tenant?  (and fb/isAuth?
-                     (or route/setup?
-                         (nil? (:tenant fb/user)))))
-(cell= (prn tenant?))
-(defc= type?    (and fb/isAuth?
-                     (:tenant fb/user)
-                     (nil? (:type fb/tenant))))
 
-(defc= support? (and fb/isAuth?
-                     (= "advanced" (:type fb/tenant))
-                     (nil? (:support fb/tenant))))
+(defc= type?    (and user/isAuth?
+                     (:tenant user/user)
+                     (nil? (:type tenant/tenant))))
 
-(defc= setup? (or tenant? type? support?))
+(defc= support? (and user/isAuth?
+                     (= "advanced" (:type tenant/tenant))
+                     (nil? (:support tenant/tenant))))
 
 (defn type! [v]
-  (fb/update-tenant! (:tenant @fb/user) {:type v}))
+  (tenant/update-tenant! (:tenant @user/user) {:type v}))
 
 (defn support! [s]
-  (fb/update-tenant! (:tenant @fb/user) {:support s}))
+  (tenant/update-tenant! (:tenant @user/user) {:support s}))
 
 (defelem type-card [attr kids]
   (semcard/card
@@ -56,12 +68,6 @@
       (semcard/content-header (:id attr))
       (semcard/content-meta (:meta attr)))
     (div :class [:ui (:msg-class attr) :message] (:msg attr))))
-
-(defelem setup-tenant [attr _]
-  (ui/row
-    attr
-    (ui/form-column
-      (forms/tenant))))
 
 (defelem setup-type [attr kids]
   (ui/segment-cards
@@ -109,77 +115,350 @@
       :msg-class :warning
       :msg "Starting at $500/month")))
 
+(defc new-tenant nil)
+
+(defc existing-tenant nil)
+
+(defc new-tenant? nil)
+
+;; new-tenant validations
+(defv tid-minimum? new-tenant #(>= (count %) 4))
+
+(defv tid-maximum? new-tenant #(<= (count %) 15))
+
+(defv tid-matches? new-tenant #(re-matches #"^[a-z0-9]*$" (str %)))
+
+(defv tid-special? new-tenant #(re-find #"^\w*$" (str %)))
+
+(defv tid-unavailble? new-tenant #(not (contains? dir/dir-tenants %)))
+
+(defv tid-blocked? new-tenant #(not (contains? dir/dir-blocked %)))
+
+;; existing-tenant validations
+(defv tid-exists? existing-tenant #(contains? dir/dir-tenants %))
+
+(defv tid-dirty? existing-tenant #(not (nil? %)))
+
+;; new-tenant validation set
+(defv= tid-valid? tid-minimum? tid-maximum? tid-matches? tid-unavailble? tid-blocked?)
+
+;; existing-tenant validation set
+(defv= existing-valid? tid-dirty? tid-exists?)
+
+;; validation errors
+(deferr err-minimum tid-minimum? "Must be more than 4 characters.")
+
+(deferr err-maximum tid-maximum? "Must be less than 15 characters.")
+
+(deferr err-matches tid-matches? "Can only contain lowercase letters and numbers.")
+
+(deferr err-special tid-special? "Cannot contain spaces or special characters.")
+
+(deferr err-unavailable tid-unavailble? "Tenant ID is currently unavailable.")
+
+(deferr err-blocked tid-blocked? "Tenant ID is currently blocked.")
+
+;; existing-tenant errors
+(deferr err-exists? tid-exists? "Tenant ID does not exist.")
+
+;; new-tenant error set
+(deferr= tid-errors err-minimum err-maximum err-matches err-special err-unavailable err-blocked)
+
+;; existing-tenant error set
+(deferr= existing-errors err-exists?)
+
+;; error toggles
+(defc= tid-error? (and (not (nil? new-tenant)) (not tid-valid?)))
+
+(defc= existing-error? (and (not (nil? existing-tenant)) (not existing-valid?)))
+
+;; notifications
+(def tenant-success! #(notify/success! :tenant_created "Tenant Created!" (str "Tenant ID: " % " successfully created.")))
+(def pending-success! #(notify/success! :access_request "Requested Access!" (str "You have requested access to Tenant ID: " %)))
+
+;; actions
+(defn create-tenant! [uid tid]
+  (let [tindex (-> @dir/dir-tenants count str keyword)]
+    (tenant/create-tenant! (:uid @user/user) tid)
+    (fb/update-directory! [:tenants tindex] tid)
+    (user/add-tenant! tid)
+    (tenant-success! tid)))
+
+(defn access-tenant! [uid tid]
+  (let []
+    (pending-success! tid)))
+
+(defn filter-tenant! [tid]
+  nil)
+
+(defn remove-tenant! [tid]
+  nil)
+
+;; elements
+(defelem tenant-button [attr kids]
+  (sembtn/labeled-icon-button
+    :class [:blue]
+    :toggle (cell= (not new-tenant?))
+    :data-content "You probably want to Start Here!"
+    :popup {:on "hover"}
+    :click #(swap! new-tenant? not)
+    (i :class [:plus :icon])
+    "Create New Tenant"))
+
+(defelem tenant-form [attr kids]
+  (semfrm/form
+    :toggle (cell= new-tenant?)
+    :class (cell= {:error tid-error?})
+    :submit #(when @tid-valid?
+               (comp (create-tenant! (:uid @user/user) @new-tenant)
+                     (reset! new-tenant nil)))
+    (semseg/basic-segment
+      (semfrm/field
+        :class (cell= {:error tid-error?})
+        (seminpt/action-input
+          :class [:left :icon]
+          (i :class [:building :icon])
+          (hoplon.core/input
+            :type "text"
+            :placeholder "Tenant ID"
+            :data-content "Unique identification and cannot be changed later: ex. degree9"
+            :popup {:on "hover"}
+            :change #(reset! new-tenant @%)
+            :value (cell= new-tenant))
+          (sembtn/icon-button
+            :data-content "Create Tenant"
+            :popup {:on "hover"}
+            :class [:left :green :submit]
+            (i :class [:right :arrow :icon]))
+          (sembtn/icon-button
+            :click #(comp (swap! new-tenant? not)
+                          (reset! new-tenant nil))
+            :data-content "Cancel"
+            :popup {:on "hover"}
+            :class [:left :red]
+            (i :class [:close :icon]))))
+      (div :class "ui error message"
+           (semlist/bulleted-list
+             (loop-tpl
+               :bindings [err tid-errors]
+               (semlist/item err)))))))
+
+(defelem tenant-menu [attr kids]
+  (semfrm/form
+    :class (cell= {:error existing-error?})
+    :submit #(when @existing-valid?
+               (comp (access-tenant! (:uid @user/user) @existing-tenant)
+                     (reset! existing-tenant nil)))
+    (semseg/basic-segment
+      (semfrm/field
+        :class (cell= {:error existing-error?})
+      (seminpt/action-input
+        :class [:left :icon]
+        (i :class [:building :icon])
+        (hoplon.core/input
+          :type "text"
+          :placeholder "Tenant ID"
+          :data-content "Enter an existing Tenant ID you would like access or find: ex. degree9"
+          :popup {:on "hover"}
+          :change #(reset! existing-tenant @%)
+          :value (cell= existing-tenant))
+        (sembtn/icon-button
+          :data-content "Request Access"
+          :popup {:on "hover"}
+          :class [:left :green :submit]
+          (i :class [:plus :icon]))
+        (sembtn/icon-button
+          :data-content "Filter Tenants"
+          :popup {:on "hover"}
+          :class [:left :blue]
+          (i :class [:filter :icon]))
+        ;(sembtn/icon-button
+        ;  :data-content "Remove Tenant"
+        ;  :popup {:on "hover"}
+        ;  :class [:left :red]
+        ;  (i :class [:trash :icon]))
+        ))
+      (div :class "ui error message"
+           :toggle existing-error?
+           (semlist/bulleted-list
+             (semlist/item err-exists?))))))
+
+(defelem tenant-list [attr kids]
+  (semitm/link-items
+    :class [:divided]
+    (loop-tpl
+      :bindings [t user/user-tenants]
+      (semitm/item
+        :click #(tenant/swap-tenant! @t)
+        (semimg/avatar ;:class [:tiny]
+                       :src "images/wireframe/image.png")
+        (semitm/content
+          :class [:middle :aligned]
+          (semhdr/h3 t))))))
+
 (defelem dash [attr kids]
-  (ui/row :class [:centered]
-    (setup-tenant :toggle tenant?)
-    (setup-type :toggle type?)
-    (setup-support :toggle support?)))
+  (semgrid/row
+    :toggle (cell= (not tenant/tenant))
+    (semgrid/grid
+      :class [:middle :aligned :stackable]
+      (semgrid/row
+        :class [:centered :middle :aligned]
+        (semgrid/column
+          :width 5
+          (tenant-button)
+          (tenant-form)))
+      (semgrid/row
+        :class [:middle :aligned]
+        (semgrid/column
+          :width 10
+          :class [:centered]
+          (semdiv/horizontal-divider "OR")))
+      (semgrid/row
+        :class [:centered :middle :aligned]
+        (semgrid/column
+          :width 5
+          :class [:center :aligned]
+          (tenant-menu)))
+      (semgrid/row
+        (semgrid/column
+          :width 6
+          :class [:centered]
+          (tenant-list))))))
 
-;(defelem users-card [attr kids]
-;  (semcard/card
-;    (assoc attr
-;      :class (cell= {:green (= (:users attr) (:users setup))
-;                     :blue (not= (:users attr) (:users setup))}))
-;    (semcard/content
-;      (i :class (:icon attr)))
-;    (semcard/content
-;      (semcard/content-meta kids))))
+(defc wizardc nil)
 
-;(defelem cat-card [attr kids]
-;  (semcard/card
-;    (assoc attr
-;      :class (cell= {:green (= (:category attr) (:category setup))
-;                     :blue (not= (:category attr) (:category setup))}))
-;    (semcard/content
-;      (i :class (:icon attr)))
-;    (semcard/content
-;      (semcard/content-header (:category attr)))))
+(defelem wizard-deploy [attr kids]
+  (semcard/card
+    :class [:blue]
+    :click #(comp (tenant/update-tenant! (:id @tenant/tenant) {:setup :deploy})
+                  (reset! wizardc :deploy))
+    (semcard/content
+      (semcard/content-header
+        "Deploy a business in the cloud.")
+      (semcard/content-description
+        (semlist/list
+          (semlist/item "Limited or no existing IT."))))))
 
+(defelem wizard-migrate [attr kids]
+  (semcard/card
+    :class [:blue]
+    :click #(comp (tenant/update-tenant! (:id @tenant/tenant) {:setup :migrate})
+                  (reset! wizardc :migrate))
+    (semcard/content
+      (semcard/content-header
+        "Migrate a business to the cloud.")
+      (semcard/content-description
+        (semlist/list
+          (semlist/item "Existing IT? Free Migration Service."))))))
 
-
-
-;(defelem tenant-users [attr _]
-;  (semseg/basic-segment
-;    (assoc attr :class [:center :aligned])
-;    (semcard/cards
-;      :class [:centered :stackable :link]
-;      (users-card
-;        :users :small
-;        :icon [:user :huge :icon]
-;        "< 50 Employees")
-;      (users-card
-;        :users :medium
-;        :icon [:users :huge :icon]
-;        "> 50 Employees")
-;      (users-card
-;        :users :large
-;        :icon [:building :outline :huge :icon]
-;        "250+ Employees"))))
-
-;(defelem tenant-cat [attr _]
-;  (semseg/basic-segment
-;    (assoc attr :class [:center :aligned])
-;    (semcard/cards
-;      :class [:centered :stackable :link]
-;      (cat-card
-;        :category "Retail"
-;        :icon [:shop :huge :icon])
-;      (cat-card
-;        :category "Service"
-;        :icon [:options :huge :icon])
-;      (cat-card
-;        :category "Manufacturing"
-;        :icon [:wizard :huge :icon])
-;      (cat-card
-;        :category "Healthcare"
-;        :icon [:heartbeat :huge :icon])
-;      (cat-card
-;        :category "Education"
-;        :icon [:student :huge :icon])
-;      (cat-card
-;        :category "Government"
-;        :icon [:university :huge :icon])
-;      (cat-card
-;        :category "Other"
-;        :icon [:users :huge :icon]))))
-
+(defelem wizard [attr kids]
+  (semgrid/row
+    :class [:centered]
+    :toggle (cell= (and tenant/tenant (:setup tenant/tenant)))
+    (semgrid/grid
+      :class [:middle :aligned :stackable]
+      (semgrid/row
+        :class [:centered :middle :aligned]
+        :toggle (cell= (= "deploy" (:setup tenant/tenant)))
+        (semgrid/column
+          (semhdr/h2 "What type of business would you like to deploy?")
+          (semcard/link-cards
+            :cards 2
+            :class [:centered :one :stackable]
+            (semcard/card
+              :class [:blue]
+              (semcard/content
+                (semcard/content-header
+                  "Restaurant or Retailer")
+                (semcard/content-description
+                  (semlist/list
+                    (semlist/item "Brick and Morter business.")
+                    (semlist/item "Point of Sale systems.")))))
+            (semcard/card
+              :class [:blue]
+              (semcard/content
+                (semcard/content-header
+                  "Professional Services")
+                (semcard/content-description
+                  (semlist/list
+                    (semlist/item "Accounting & Law")
+                    (semlist/item "Architecture & Engineering")))))
+            (semcard/card
+              :class [:blue]
+              (semcard/content
+                (semcard/content-header
+                  "Healthcare")
+                (semcard/content-description
+                  (semlist/list
+                    (semlist/item "Dentists")
+                    (semlist/item "Doctors & Pharmasists")))))
+            (semcard/card
+              :class [:blue]
+              (semcard/content
+                (semcard/content-header
+                  "Education & Government")
+                (semcard/content-description
+                  (semlist/list
+                    (semlist/item "Schools")
+                    (semlist/item "Government Organizations")))))
+            (semcard/card
+              :class [:blue]
+              :click #(comp (tenant/dissoc-tenant! (:id @tenant/tenant) :setup)
+                            (route/dash!))
+              (semcard/content
+                (semcard/content-header
+                  "IT & Other...")
+                (semcard/content-description
+                  (semlist/list
+                    (semlist/item "Go straight to the dashboard."))))))))
+      (semgrid/row
+        :toggle (cell= (true? (:setup tenant/tenant)))
+        (semgrid/column
+          :class [:center :aligned]
+          (semhdr/h2 "Hello, what would you like to do?")
+          (semcard/link-cards
+            :class [:centered :one]
+            (wizard-deploy)
+            (wizard-migrate))))
+      (semgrid/row
+        :toggle (cell= (= "migrate" (:setup tenant/tenant)))
+        (let [labelc (cell "Contact Info")]
+          (semgrid/column
+          :class [:left :aligned]
+          (semsteps/steps
+            :steps true
+            :class [:top :attached]
+            (semsteps/step
+              :icon [:phone :icon]
+              :title "Contact"
+              "Someone will be in touch!")
+            (semsteps/step
+              :icon [:computer :icon]
+              :title "Analysis"
+              "IT needs identified.")
+            (semsteps/step
+              :icon [:cloud :icon]
+              :title "Public Cloud"
+              "Cloud infrastructure provisioned.")
+            (semsteps/step
+              :icon [:server :icon]
+              :title "App Servers"
+              "App & Business Servers provisioned.")
+            (semsteps/step
+              :icon [:life :ring :icon]
+              :title "Support"
+              "Choose your support option."))
+          (let [progressc (cell 0)]
+            (semprog/progress
+            :class [:bottom :attached :blue]
+            :progress (cell= {:total 5 :value progressc})
+            (semprog/bar)))
+          (semdiv/horizontal-divider (text "~{labelc}")))))
+        (semgrid/row
+          :class [:centered]
+        :toggle (cell= (= "migrate" (:setup tenant/tenant)))
+        (semgrid/column
+          :class [:left :aligned]
+          :width 5
+          ;(forms/user)
+          )))))

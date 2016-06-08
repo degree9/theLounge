@@ -1,0 +1,86 @@
+(ns lounge.notifications
+  (:require [semantic-ui.collections.grid :as semgrid]
+            [semantic-ui.collections.menu :as semmenu]
+            [semantic-ui.elements.segment :as semseg]
+            [semantic-ui.collections.message :as semmsg]
+            [semantic-ui.elements.header :as semhdr]
+            [semantic-ui.elements.list :as semlst]
+            [firebase-cljs.database :as fbdb]
+            [lounge.ui :as ui]
+            [lounge.firebase :as fb]
+            [lounge.user :as user]
+            [lounge.dash.cards :as cards]
+            [lounge.route :as route]
+            [lounge.util :as util]))
+
+(defc notifications-fb nil)
+
+(defc notifications-default nil)
+
+(defc= notifications-all (util/deep-merge notifications-default notifications-fb))
+
+;(cell= (prn notifications-default))
+
+(defn ->kw [v] (-> v str keyword))
+
+(defn ->str [v] (-> v name str))
+
+(defn notification! [severity id title & [message]]
+  (let [ref (fb/notify (:uid @user/user) [severity id])]
+    (comp
+      (fbdb/merge! ref {:title title})
+      (when message (fbdb/conj! (fbdb/get-in ref [:messages]) message)))))
+
+(defn remove-notifications! [severity]
+  (fbdb/remove! (fb/notify (:uid @user/user) [severity])))
+
+(defn info! [id title & [message]]
+  (notification! :info id title message))
+
+(defn warning! [id title & [message]]
+  (notification! :warning id title message))
+
+(defn error! [id title & [message]]
+  (notification! :error id title message))
+
+(defn success! [id title & [message]]
+  (notification! :success id title message))
+
+(defn listen-notifications [uid state]
+  (fb/listen-val (fb/notify uid) state))
+
+(defn login [uid]
+  (listen-notifications "default" notifications-default)
+  (listen-notifications uid notifications-fb))
+
+(defelem messages [attr kids]
+  (semlst/bulleted-list
+    (loop-tpl
+      :bindings [[_ m] (:data-messages attr)]
+      (semlst/item m))))
+
+(defelem notification [attr _]
+  (div
+    (loop-tpl
+      :bindings [[_ notify] (:data-notification attr)]
+      (div
+        (semhdr/h5 (cell= (:title notify))
+                   (messages :data-messages (cell= (:messages notify))))))))
+
+(defelem notifications [attr kids]
+  (div
+    (loop-tpl
+      :bindings [[severity notify] (:data-notifications attr)]
+      (semmsg/compact-message
+        :class (cell= (when severity [severity]))
+        (i :class [:close :icon]
+           :click #(remove-notifications! @severity))
+        (notification :data-notification notify)))))
+
+(defelem dash [attr kids]
+  (semgrid/row
+    :class [:centered :middle :aligned]
+    (semgrid/column
+      :width 8
+      :class [:centered :middle :aligned]
+      (notifications :data-notifications notifications-all))))

@@ -1,0 +1,86 @@
+(ns lounge.user
+  (:refer-clojure :exclude [name])
+  (:require [cljs.pprint :as pp]
+            [cljsjs.firebase]
+            [firebase-cljs.database :as fbdb]
+            [firebase-cljs.user :as fbuser]
+            [firebase-cljs.database.datasnapshot :as fbsnap]
+            [firebase-cljs.promise :as fbprom]
+            [lounge.firebase :as fb]
+            [lounge.directory :as dir]))
+
+(defc user-auth nil)
+
+(defc user-fb nil)
+
+(defc user-role nil)
+
+(defc user-notifications nil)
+
+(defc= user (merge user-auth
+                   user-fb
+                   (when user-role
+                     {:role user-role})))
+(cell= (prn user))
+(defc= user-tenants (into #{} (map val (:tenants user))))
+
+(defc= isAuth? (not (nil? user)))
+
+(defn uid
+  ([]
+   (:uid @user))
+  ([u]
+   (fbuser/uid u)))
+
+(defn email
+  ([]
+   (:email @user))
+  ([u]
+   (fbuser/email u)))
+
+(defn name
+  ([]
+   (:name @user))
+  ([u]
+   (fbuser/name u)))
+
+(defn photo
+  ([]
+   (:photo @user))
+  ([u]
+   (fbuser/photo-url u)))
+
+(defn auth-data! [user]
+  (reset!
+    user-auth
+    {:uid (uid user)
+     :email (email user)
+     :name (name user)
+     :photo (photo user)
+     :verified (fbuser/verified? user)}))
+
+(defn add-tenant! [tid]
+  (fbdb/conj! (fb/users (:uid @user) [:tenants]) tid))
+
+(defn assoc-user! [ukey uval]
+  (fbdb/reset! (fb/users (:uid @user) [ukey]) uval))
+
+(defn update-user! [udat]
+  (fbdb/merge! (fb/users (:uid @user)) (dissoc udat :uid)))
+
+(defn listen-user [uid state]
+  (fb/listen-val (fb/users uid) state))
+
+(defn persist-user [uid]
+  (-> (fb/users uid)
+      (fbdb/listen-promise
+        "value"
+        #(when-not (fbsnap/exists %)
+           (fbdb/reset! (fb/users uid) {:enabled true})))))
+
+(defn login [user]
+  (.log js/console user)
+  (auth-data! user)
+  ;(persist-user (uid user))
+  ;(.then (fbdb/listen-once (fb/users (uid user)) "value" #()) #(prn "once" (fbsnap/exists %)))
+  (listen-user (uid user) user-fb))

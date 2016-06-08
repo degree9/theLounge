@@ -1,0 +1,9 @@
+(ns lounge.analytics
+  (:require [cljsjs.google-analytics]))
+
+;(def goog-analytics js/window)
+
+(defn ga [& more]
+  (when js/ga
+    (.. (aget js/window "ga")
+        (apply nil (clj->js more)))))

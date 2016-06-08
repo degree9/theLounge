@@ -1,0 +1,27 @@
+(ns lounge.roles
+  (:require [cljsjs.firebase]
+            [firebase-cljs.database :as fbdb]
+            [firebase-cljs.user :as fbuser]
+            [lounge.firebase :as fb]))
+
+(defc role-fb nil)
+
+(defc= role role-fb)
+
+(cell= (prn role))
+
+(defn listen-role [state]
+  (fb/listen-val (fb/roles) state))
+
+(defn handle-login [user]
+  (let [uid (fbuser/uid user)]
+    (listen-role role-fb)))
+
+(defn handle-logout []
+  (dosync
+    (reset! role-fb nil)))
+
+(fb/auth-changed
+  fb/auth
+  #(if % (handle-login %) (handle-logout)))
+

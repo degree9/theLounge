@@ -10,7 +10,8 @@
       },
       "tenants": {
         "$tenant": {
-          ".validate": "newData.isString() || newData.val() == null"
+          ".validate": "newData.isString() || newData.val() == null",
+          ".write": "data.val() == null && auth != null && data.val() == null"
         }
       },
       "pending": {
@@ -47,11 +48,6 @@
           "$tenant": {
             ".validate": "newData.isString() || newData.val() == null"
           }
-        },
-        "notifications": {
-          "$notification": {
-            ".validate": "newData.hasChildren() || newData.val() == null"
-          }
         }
       }
     },
@@ -74,12 +70,7 @@
           ".validate": "false"
         },
         ".write": "data.val() == null && newData.child('users').child(auth.uid).val() != null || data.val() != null && newData.val() != null && data.child('users').child(auth.uid).val() != null",
-        ".read": "data.child('users').child(auth.uid).val() != null || auth != null && $tenant == 'default'",
-        "notifications": {
-          "$notification": {
-            ".validate": "newData.hasChildren() || newData.val() == null"
-          }
-        }
+        ".read": "data.child('users').child(auth.uid).val() != null || auth != null && $tenant == 'default'"
       }
     },
     "settings": {
@@ -116,6 +107,28 @@
         "$other": {
           ".validate": "false"
         }
+      }
+    },
+    "notifications": {
+      "$user": {
+        ".validate": "newData.hasChildren() || newData.val() == null",
+        "info": {
+          ".validate": "newData.hasChildren() || newData.val() == null"
+        },
+        "success": {
+          ".validate": "newData.hasChildren() || newData.val() == null"
+        },
+        "warning": {
+          ".validate": "newData.hasChildren() || newData.val() == null"
+        },
+        "error": {
+          ".validate": "newData.hasChildren() || newData.val() == null"
+        },
+        "$other": {
+          ".validate": "false"
+        },
+        ".read": "auth != null && auth.uid == $user",
+        ".write": "auth != null && auth.uid == $user"
       }
     }
   }

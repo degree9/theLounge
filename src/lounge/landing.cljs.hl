@@ -1,6 +1,11 @@
 (ns lounge.landing
+  (:refer-hoplon :exclude [footer])
   (:require [semantic-ui.core :as semui]
+            [semantic-ui.elements.button :as sembtn]
+            [semantic-ui.elements.header :as semhdr]
+            [semantic-ui.elements.list :as semlst]
             [semantic-ui.elements.container :as semcont]
+            [semantic-ui.elements.divider :as semdiv]
             [semantic-ui.elements.step :as steps]
             [semantic-ui.elements.segment :as semseg]
             [semantic-ui.collections.menu :as semmenu]
@@ -10,33 +15,47 @@
             [lounge.route :as route]
             [lounge.ui :as ui]))
 
+(defelem action-button [attr kids]
+  (sembtn/button
+    (merge {:class [:huge :primary]
+            :click #(comp (fb/login!) (route/dash!))}
+           attr)
+    kids
+    (i :class [:right :arrow :icon])))
+
 (defelem banner [attr kids]
   (semseg/vertical-segment
     :class [:inverted :banner :center :aligned]
-    (semcont/container (ui/toolbar))
-    (semcont/container (h1 :class "ui inverted header" (span "Imagine IT...  ") (span :id "hype")))))
+    (semcont/container
+      (ui/toolbar)
+      (h1 :class "ui inverted header" (span "Imagine IT...  ") (span :id "hype"))
+      (br)(br)
+      (action-button "Get Started"))))
 
 (defelem intro [attr kids]
   (semseg/vertical-segment
     :class [:stripe]
     (semcont/grid-container
       :class [:middle :aligned :stackable]
-      (semgrid/column
+      (semgrid/row
+        (semgrid/column
         :width 8
+        (h3 :class [:ui :header] "One-Click Infrastructure & App Servers")
+        (p "Deploy enterprise grade solutions without IT staff or technical skills.")
         (h3 :class [:ui :header] "Manage your IT Automagically!")
-        (p "Using modern automation written in an AI language. Lisp.")
-        (h3 :class [:ui :header] "Where do you find your IT ninja's?")
-        (p "The internet, sleeping under desks and buried in parentheses.")
-        (h3 :class [:ui :header] "Actually?")
-        (p "Yep. Our solutions are Open-Source and community developed."
-           (br)(br)
-           "Because \"none of us is as smart as all of us.\""
-           (br)
-           "- Kenneth H. Blanchard"))
+        (p "Build scalable IT using automation and cloud technologies.")
+        (h3 :class [:ui :header] "Order and Provision Hardware")
+        (p "Design a hybrid cloud with On-Premise Workstations/Mobile, Retail/POS and Security."))
       (semgrid/column
         :class [:right :floated]
         :width 6
-        (img :class "ui large rounded image" :src "images/wireframe/image.png")))))
+        (img :class "ui large rounded bordered image" :src "images/wireframe/white-image.png")))
+      (semgrid/row
+        (semgrid/column
+          :class [:center :aligned]
+          (action-button
+            :class [:huge :basic :blue]
+            "Automate Your IT"))))))
 
 (defelem our-process [attr kids]
   (let [togglec (cell true)]
@@ -45,27 +64,77 @@
       (semcont/container
         :class [:center :aligned]
         (h3 "How does this all work?")(br)
-        (semcont/text-container
-          (semmenu/menu
-            :class [:fluid :link :item]
-            (semmenu/item :class (cell= {:active togglec}) :click #(reset! togglec true) "Short answer!" )
-            (semmenu/item :class (cell= {:active (not togglec)}) :click #(reset! togglec false) "Long answer." )))
-        (br)(br)
-        (div
-          :toggle (cell= togglec)
-          (steps/steps
-            :class [:stackable]
-            (steps/step :icon "users"   :title "You!"      "Need simple and cost effective IT solutions.")
-            (steps/step :icon "desktop" :title "We."       "Build great solutions.")
-            (steps/step :icon "globe"   :title "Together!" "We move your business forward.")))
-        (div
-          :toggle (cell= (not togglec))
-          (steps/steps
-            :class [:stackable]
-            (steps/step :icon "cloud"     :title "We."          "Build integrations on top of existing clouds.")
-            (steps/step :icon "users"     :title "Communities." "Build great software.")
-            (steps/step :icon "lab"       :title "We."          "Automate this software on our cloud solutions.")
-            (steps/step :icon "dashboard" :title "You!"         "Get blinky status lights and buttons, which do all the work.")))))))
+        (steps/steps
+          :class [:stackable]
+          (steps/step :icon [:cloud :icon]     :title "Clouds." "Built on top of cloud computing.")
+          (steps/step :icon [:lab :icon]       :title "Automation." "Fast consistent deployments.")
+          (steps/step :icon [:dashboard :icon] :title "Reporting." "Blinky status lights."))))))
+
+(defelem customer-perks [attr kids]
+  (semseg/vertical-segment
+    :class [:stripe]
+    (semcont/container
+      :class [:center :aligned]
+      (h3 "Automated IT Platform.")
+      (steps/steps
+        :class [:stackable]
+        (steps/step :icon [:cloud :icon] :title "Zero Hardware." "Start your business in the cloud.")
+        (steps/step :icon [:users :icon] :title "Scalable." "Expand your IT as your business grows.")
+        (steps/step :icon [:building :outline :icon] :title "Professional!" "Enterprise solutions for everyone.")))))
+
+(defelem customer-quote [attr kids]
+  (semseg/vertical-segment
+    :class [:quote :stripe :center :aligned]
+    (semgrid/grid
+      :class [:equal :width :stackable :internally :celled]
+      (semgrid/row
+        (semgrid/column
+          (semhdr/h3 "\"Build your business without worrying about IT.\"")
+          (p "~ Matt Ratzke, Founder"))
+        (semgrid/column
+          (semhdr/h3 "Transform your IT from a cost center to a profit center.") (br)
+          (action-button
+            :class [:huge :basic :blue]
+            "Get Automated"))))))
+
+(defelem customer-uses [attr kids]
+  (semseg/vertical-segment
+    :class [:stripe]
+    (semcont/text-container
+      :class [:center :aligned]
+      (semhdr/h3 "IT Solutions for every industry.")
+      (semdiv/horizontal-divider "Our Users"))
+    (semcont/text-container
+      :class [:left :aligned]
+      (semhdr/h2 "Retail & Restaurant's")
+      (p "Deploy Point of Sale systems without the hassle.")
+      (action-button
+        :class [:huge :basic :blue]
+        "Deploy Point of Sale")
+      (semdiv/hidden-divider))
+    (semcont/text-container
+      :class [:right :aligned]
+      (semhdr/h2 "Accounting & Law")
+      (p "Setup and manage your firm without IT staff, extended support options available.")
+      (action-button
+        :class [:huge :basic :blue]
+        "Deploy Business Apps")
+      (semdiv/hidden-divider))
+    (semcont/text-container
+      :class [:left :aligned]
+      (semhdr/h2 "Architecture & Design")
+      (p "Make sure everyone is up to date and running the latest design software.")
+      (action-button
+        :class [:huge :basic :blue]
+        "Deploy Design Apps")
+      (semdiv/hidden-divider))
+    (semcont/text-container
+      :class [:right :aligned]
+      (semhdr/h2 "Everything else...")
+      (p "Find more ways to improve your ROI by using Automation.")
+      (action-button
+        :class [:huge :basic :blue]
+        "Discover More"))))
 
 (defelem devices-support-more [attr kids]
   (let [togglec (cell :devices)]
@@ -76,6 +145,7 @@
         (h3 "What if I need more than just software?")(br)
         (semcont/text-container
           (semmenu/menu
+            :items true
             :class [:fluid :link :item]
             (semmenu/item :class (cell= {:active (= togglec :devices)})  :click #(reset! togglec :devices)  "Client Devices")
             (semmenu/item :class (cell= {:active (= togglec :clouds)})   :click #(reset! togglec :clouds)   "Private Clouds")
@@ -86,36 +156,62 @@
           :toggle (cell= (= togglec :devices))
           (steps/steps
             :class [:stackable]
-            (steps/step :icon "desktop"   :title "Select Hardware." "Available from top brands.")
-            (steps/step :icon "lightning" :title "We."              "Provision and customize devices.")
-            (steps/step :icon "truck"     :title "Then."            "Equipment is sent to you!")
-            (steps/step :icon "laptop"    :title "You!"             "Get business ready quipment upon arrival!")))
+            (steps/step :icon [:desktop :icon]   :title "Select Hardware." "Available from top brands.")
+            (steps/step :icon [:lightning :icon] :title "We." "Provision and customize devices.")
+            (steps/step :icon [:laptop :icon]    :title "You!" "Get business ready equipment upon arrival!")))
         (div
           :toggle (cell= (= togglec :clouds))
           (steps/steps
             :class [:stackable]
-            (steps/step :icon "server"  :title "You." "Select your preferred cloud infrastructure.")
-            (steps/step :icon "options" :title "We."  "Provision and configure your platform.")
-            (steps/step :icon "rocket"  :title "You!" "Get your own on-premise full-stack cloud.")))
+            (steps/step :icon [:server :icon]  :title "You." "Select your preferred cloud infrastructure.")
+            (steps/step :icon [:options :icon] :title "We." "Provision and configure your platform.")
+            (steps/step :icon [:rocket :icon]  :title "You!" "Get your own on-premise full-stack cloud.")))
         (div
           :toggle (cell= (= togglec :support))
           (steps/steps
             :class [:stackable]
-            (steps/step :icon "life ring" :title "You."    "Select your level of support.")
-            (steps/step :icon "fire"      :title "Issues." "Get identified and reported.")
-            (steps/step :icon "doctor"    :title "We."     "Assign technicians to resolve the problem.")))
+            (steps/step :icon [:life :ring :icon] :title "You." "Select your level of support.")
+            (steps/step :icon [:fire :icon]      :title "Issues." "Get identified and reported.")
+            (steps/step :icon [:doctor :icon]    :title "We." "Assign technicians to resolve the problem.")))
         (div
           :toggle (cell= (= togglec :security))
           (steps/steps
             :class [:stackable]
-            (steps/step :icon "camera"  :title "Video Surveillance." "Provides on-site security options.")
-            (steps/step :icon "server"  :title "Security Servers."   "Manage and store data for cameras and access control units.")
-            (steps/step :icon "protect" :title "Total."              "Infrastructure security in the Cloud and On-Premise.")))))))
+            (steps/step :icon [:camera :icon]  :title "Video Surveillance." "Provides on-site security options.")
+            (steps/step :icon [:server :icon]  :title "Security Servers." "Management for cameras and access control.")
+            (steps/step :icon [:protect :icon] :title "Total Secrity!" "In the Cloud and On-Premise.")))))))
+
+(defelem footer [attr kids]
+  (semseg/vertical-segment
+    :class [:inverted :footer]
+    (semcont/grid-container
+      :class [:inverted :divided :equal :height :stackable]
+      (semgrid/column
+        :width 3
+        (semhdr/h4 :class [:inverted] "About")
+        (semlst/list
+          :class [:inverted :link]
+          (semlst/item "Contact Us")))
+      (semgrid/column
+        :width 3
+        (semhdr/h4 :class [:inverted] "Services")
+        (semlst/list
+          :class [:inverted :link]
+          (semlst/item "Coming Soon")))
+      (semgrid/column
+        :width 10
+        (semhdr/h4 :class [:inverted] "theLounge.io // IT Automation Platform"))
+      )))
+
 
 (defelem landing [attr kids]
   (div
     :toggle route/home?
     (banner)
     (intro)
+    (customer-perks)
+    (customer-quote)
+    (customer-uses)
     (our-process)
-    (devices-support-more)))
+    (devices-support-more)
+    (footer)))

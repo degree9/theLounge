@@ -12,22 +12,20 @@
                 [semantic-ui.collections.grid :as semgrid]
                 [semantic-ui.behaviors.form]
                 [lounge.firebase :as fb]
+                [lounge.user :as user]
+                [lounge.tenant :as tenant]
+                [lounge.directory :as dir]
+                [lounge.roles]
                 [lounge.route :as route]
                 [lounge.logging :as log]
+                [lounge.setup :as setup]
+                [lounge.notifications :as notify]
                 [goog.dom]
                 [cljsjs.typedjs]
                 [cljsjs.scrollify]
                 [cljs.pprint :as p]
-                [matchbox.core :as mbox]
-                [matchbox.registry :as mreg]
-                [promesa.core :as prom]
-                [matchbox.promise :as mprom]
-                [matchbox.protocols :as proto]
-                [cljs.analyzer])
-      ;(:require-macros [matchbox.promise :refer []])
-      )
-
-(fb/connect! "https://d9lounge.firebaseio.com")
+                [cljs.analyzer]
+                [lounge.analytics :as analytics]))
 
 (html
   (head
@@ -81,6 +79,13 @@
              margin: 3em 0em;
              }
 
+             .quote.stripe.segment {
+             padding: 0em;
+             }
+             .quote.stripe.segment .grid .column {
+             padding-top: 5em;
+             padding-bottom: 5em;
+             }
              .last.container {
              margin-bottom: 300px !important;
              }
@@ -95,6 +100,11 @@
              }
              h3.ui.center.header {
              padding: 2em 0em;}
+
+
+             .footer.segment {
+             padding: 5em 0em;
+             }
 
              .typed-cursor{
              opacity: 1;
@@ -123,19 +133,30 @@
       (dash/dash)))
 
 (.typed (js/jQuery "#hype")
-        (clj->js {:strings ["but simple!" "automated!" "self-managed!" "for real people."]
+        (clj->js {:strings ["but simple!" "automated!" "managed anywhere!" "for everyone."]
                   :typeSpeed 50 :startDelay 500 :backSpeed 30 :backDelay 500}))
 
-(forms/validate)
+(defn handle-login [user]
+  (let [uid (user/uid user)]
+    (user/login user)
+    (dir/listen-dir dir/directory-fb)
+    (notify/login uid)
+    (tenant/login uid)))
 
-(defc teststate nil)
-(cell= (prn teststate))
-(mbox/deref (mbox/get-in (fb/tenants) [:demo]) teststate identity)
+(defn handle-logout []
+  (dosync
+    (reset! user/user-fb nil)
+    (reset! user/user-auth nil)
+    (reset! notify/notifications-fb nil)
+    (tenant/logout)
+    ;(reset! tenant/tenant-fb nil)
+    ))
 
-;(-> (mprom/promise (fb/tenants :demo2))
-    ;(mprom/then mprom/-val)
-;    (mprom/catch prn)
-;    )
-;(promise-> (fb/users :demo) prn :catch prn )
+;; Authentication
+(fb/auth-changed
+  fb/auth
+  #(if % (handle-login %) (handle-logout)))
 
-;(.catch (.then (.once (fb/tenants :demo2) "value") prn) prn)
+;; Analytics
+(analytics/ga "create" "UA-78703565-1" "auto")
+(analytics/ga "send" "pageview")

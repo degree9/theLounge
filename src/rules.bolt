@@ -17,21 +17,29 @@ getRole(id) {root.roles[id]}
 getSetting(id) {root.settings[id]}
 
 path /directory is Directory;
-path /directory/blocked/{block} is String | Null;
-path /directory/tenants/{tenant} is String | Null;
+path /directory/blocked/{block} is DirectoryBlocked | Null;
+path /directory/tenants/{tenant} is DirectoryTenants | Null;
 path /directory/pending/{tenant} is DirectoryPending | Null;
 path /users/{user} is User;
 path /users/{user}/tenants/{tenant} is String | Null;
-path /users/{user}/notifications/{notification} is Notification | Null;
 path /tenants/{tenant} is Tenant | Null;
-path /tenants/{tenant}/notifications/{notification} is Notification | Null;
 path /settings/{setting} is Setting | Null;
 path /roles/{role} is Role | Null;
 path /billing/{tenant} is BillingTenant | Null;
+path /notifications/{user} is Notifications | Null;
 
 type Directory extends Object{
 
   read() {isAuth()}
+}
+
+type DirectoryBlocked extends String{
+
+}
+
+type DirectoryTenants extends String{
+
+  create() {isAuth() && isNull(prior(this))}
 }
 
 type DirectoryPending extends Object{
@@ -40,11 +48,11 @@ type DirectoryPending extends Object{
 }
 
 type User extends Object{
-  email: String,
-  displayName: String,
-  profileImageURL: String,
+  email: String | Null,
+  name: String | Null,
+  photo: String | Null,
+  phone: String | Null,
   enabled: Boolean | Null,
-  tenant: String | Null
 
   read()   {isCurrent(user) || isDefault(user)}
   write()  {isCurrent(user)}
@@ -54,11 +62,23 @@ type Tenant extends Object{
   users: Object,
   enabled: Boolean | Null,
   support: String | Null,
-  type: String | Null
+  type: String | Null,
+  setup: Boolean | String | Null
 
   read()   {hasUser(this, auth.uid) || isDefault(tenant)}
   create() {hasUser(this, auth.uid)}
   update() {hasUser(prior(this), auth.uid)}
+}
+
+type Notifications extends Object {
+  info: Notification | Null,
+  success: Notification | Null,
+  warning: Notification | Null,
+  error: Notification | Null
+
+
+  read()  {isCurrent(user) || isDefault(user)}
+  write() {isCurrent(user)}
 }
 
 type Notification extends Object {
