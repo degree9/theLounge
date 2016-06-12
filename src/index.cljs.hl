@@ -19,6 +19,7 @@
                 [lounge.logging :as log]
                 [lounge.setup :as setup]
                 [lounge.notifications :as notify]
+                [lounge.skel :as skel]
                 [goog.dom]
                 [cljsjs.jquery]
                 [cljsjs.typedjs]
@@ -28,12 +29,10 @@
                 [cljsjs.scrollex]
                 [lounge.analytics :as analytics]))
 
-(.breakpoints js/skel
-              #js {:xlarge "(max-width: 1680px)"
-                   :large  "(max-width: 1280px)"
-                   :medium "(max-width: 980px)"
-                   :small  "(max-width: 736px)"
-                   :xsmall "(max-width: 480px)"})
+(defn on-window-load [f] (.on "load" (js/jQuery js/window) f))
+
+(skel/breakpoints!)
+
 
 (html
   (head
@@ -148,7 +147,7 @@
              100% { opacity:1; }
              }
           "))
-    (body :class {:landing true :is-loading true :is-mobile (.. js/skel .-vars .-mobile)}
+    (skel/body :class {:landing true}
       (landing/landing)
       (dash/dash)))
 
@@ -172,11 +171,6 @@
     (tenant/logout)
     ;(reset! tenant/tenant-fb nil)
     ))
-
-;; Init Complete
-(-> (js/jQuery js/window)
-    (.on "load" #(-> (js/jQuery "body")
-                     (.removeClass "is-loading"))))
 
 ;; Authentication
 (with-init!

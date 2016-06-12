@@ -1,0 +1,45 @@
+(ns lounge.skel
+  (:refer-hoplon :exclude [body])
+  (:require [cljsjs.skel])
+  (:require-macros [lounge.skel :refer [with-breakpoint]]))
+
+;; Init Skell Breakpoints
+(defn breakpoints!
+  ([]
+   (breakpoints! :xlarge "1680px"
+                 :large  "1280px"
+                 :medium "980px"
+                 :small  "736px"
+                 :xsmall "480px"))
+  ([& {:keys [xlarge large medium small xsmall]}]
+   (.breakpoints js/skel
+                 #js {:xlarge (str "(max-width:" xlarge ")")
+                      :large  (str "(max-width:" large  ")")
+                      :medium (str "(max-width:" medium ")")
+                      :small  (str "(max-width:" small  ")")
+                      :xsmall (str "(max-width:" xsmall ")")})))
+
+;; Skell Event Methods
+(defn on [events f]
+  (.on js/skel events f))
+
+;; Skel Defaults
+(def ^:dynamic *skel-loading* (cell true))
+(def ^:dynamic *skel-mobile*  (cell (aget js/skel "vars" "mobile")))
+
+;; Skel Elements
+(defelem body [attr kids]
+  (let [mobile  (or (:mobile attr) *skel-mobile*)
+        loading (or (:loading attr) *skel-loading*)
+        class   (cell= (merge {:is-mobile mobile
+                               :is-loading loading} (:class attr)))
+        attr    (assoc attr :class class)]
+    (hoplon.core/body attr kids)))
+
+;; Skell Window Load Complete
+(-> (js/jQuery js/window)
+    (.on "load" #(reset! *skel-loading* false)))
+
+;; Skel Toggle Mobile Cell
+(with-breakpoint -medium #(reset! *skel-mobile* false))
+(with-breakpoint +medium #(reset! *skel-mobile* true))

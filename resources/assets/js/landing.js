@@ -24,16 +24,16 @@
 		//	});
 
 		// Mobile?
-			if (skel.vars.mobile)
-				$body.addClass('is-mobile');
-			else
-				skel
-					.on('-medium !medium', function() {
-						$body.removeClass('is-mobile');
-					})
-					.on('+medium', function() {
-						$body.addClass('is-mobile');
-					});
+		//	if (skel.vars.mobile)
+		//		$body.addClass('is-mobile');
+		//	else
+		//		skel
+		//			.on('-medium !medium', function() {
+		//				$body.removeClass('is-mobile');
+		//			})
+		//			.on('+medium', function() {
+		//				$body.addClass('is-mobile');
+		//			});
 
 		// Prioritize "important" elements on medium.
 			skel.on('+medium -medium', function() {
