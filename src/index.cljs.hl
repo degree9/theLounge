@@ -1,5 +1,4 @@
 (page "index.html"
-      (:refer-clojure :exclude [deref])
       (:require [lounge.ui :as ui]
                 [lounge.forms :as forms]
                 [lounge.landing :as landing]
@@ -21,11 +20,20 @@
                 [lounge.setup :as setup]
                 [lounge.notifications :as notify]
                 [goog.dom]
+                [cljsjs.jquery]
                 [cljsjs.typedjs]
                 [cljsjs.scrollify]
-                [cljs.pprint :as p]
                 [cljs.analyzer]
+                [cljsjs.skel]
+                [cljsjs.scrollex]
                 [lounge.analytics :as analytics]))
+
+(.breakpoints js/skel
+              #js {:xlarge "(max-width: 1680px)"
+                   :large  "(max-width: 1280px)"
+                   :medium "(max-width: 980px)"
+                   :small  "(max-width: 736px)"
+                   :xsmall "(max-width: 480px)"})
 
 (html
   (head
@@ -33,9 +41,21 @@
     (html-meta :http-equiv "X-UA-Compatible" :content "IE=edge,chrome=1")
     (html-meta :name "viewport" :content "width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1")
 
+    ;; Landing Page CSS
+    (link :rel "stylesheet" :href "css/landing.css" :disabled (cell= route/dash?))
+
     (title "theLounge.io - IT Automation")
-    (link :rel "stylesheet" :type "text/css" :href "bower_components/semantic-ui/dist/semantic.css")
+    (link :rel "stylesheet" :type "text/css" :href "bower_components/semantic-ui/dist/semantic.css" :disabled (cell= route/home?))
     (link :rel "stylesheet" :href "bower_components/animate-css/animate.css")
+
+
+    ;; Landing Page JS
+    ;(script :src "js/jquery.scrollex.min.js")
+    (script :src "js/jquery.scrolly.min.js")
+    (script :src "js/landing-util.js")
+    (script :src "js/landing.js")
+
+    ;; Stripe Checkout
     (script :src "https://checkout.stripe.com/checkout.js")
     (style "
              .banner.segment {
@@ -128,13 +148,14 @@
              100% { opacity:1; }
              }
           "))
-    (body
+    (body :class {:landing true :is-loading true :is-mobile (.. js/skel .-vars .-mobile)}
       (landing/landing)
       (dash/dash)))
 
-(.typed (js/jQuery "#hype")
-        (clj->js {:strings ["but simple!" "automated!" "managed anywhere!" "for everyone."]
-                  :typeSpeed 50 :startDelay 500 :backSpeed 30 :backDelay 500}))
+;(.typed (js/jQuery "#hype")
+;        (clj->js {:strings ["but simple!" "automated!" "managed anywhere!" "for everyone."]
+;                  :typeSpeed 50 :startDelay 500 :backSpeed 30 :backDelay 500}))
+
 
 (defn handle-login [user]
   (let [uid (user/uid user)]
@@ -152,11 +173,18 @@
     ;(reset! tenant/tenant-fb nil)
     ))
 
+;; Init Complete
+(-> (js/jQuery js/window)
+    (.on "load" #(-> (js/jQuery "body")
+                     (.removeClass "is-loading"))))
+
 ;; Authentication
-(fb/auth-changed
-  fb/auth
-  #(if % (handle-login %) (handle-logout)))
+(with-init!
+  (fb/auth-changed
+    fb/auth
+    #(if % (handle-login %) (handle-logout))))
 
 ;; Analytics
-(analytics/ga "create" "UA-78703565-1" "auto")
-(analytics/ga "send" "pageview")
+(with-init!
+  (comp (analytics/ga "create" "UA-78703565-1" "auto")
+        (analytics/ga "send" "pageview")))

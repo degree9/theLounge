@@ -1,7 +1,6 @@
 (ns lounge.firebase
   (:refer-clojure :exclude [deref])
   (:require [cljsjs.firebase]
-            [cljs.pprint :as p]
             [clojure.string :as s]
             [firebase-cljs.core :as fb]
             [firebase-cljs.auth :as fbauth]

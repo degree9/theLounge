@@ -1,7 +1,6 @@
 (ns lounge.user
   (:refer-clojure :exclude [name])
-  (:require [cljs.pprint :as pp]
-            [cljsjs.firebase]
+  (:require [cljsjs.firebase]
             [firebase-cljs.database :as fbdb]
             [firebase-cljs.user :as fbuser]
             [firebase-cljs.database.datasnapshot :as fbsnap]

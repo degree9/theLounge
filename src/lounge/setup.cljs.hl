@@ -23,10 +23,11 @@
             [lounge.user :as user]
             [lounge.tenant :as tenant]
             [lounge.directory :as dir]
-            [lounge.forms :as forms]
+            ;[lounge.forms :as forms]
             [lounge.route :as route]
             [lounge.notifications :as notify]
-            [clojure.string :as s])
+            [clojure.string :as s]
+            [goog.crypt.base64 :as base64])
   (:require-macros [lounge.forms :refer [defv defv= deferr deferr=]]))
 
 
@@ -460,5 +461,67 @@
         (semgrid/column
           :class [:left :aligned]
           :width 5
-          ;(forms/user)
-          )))))
+          (let [contactc (cell nil)]
+          (semfrm/form
+            :toggle true
+            (semseg/basic-segment
+              (semfrm/field
+                (label "Full Name")
+                (seminpt/icon-input
+                  :class [:left]
+                  (i :class [:user :icon])
+                  (hoplon.core/input
+                    :type "text"
+                    :placeholder "Full Name"
+                    :data-content "Please enter your full name."
+                    :popup {:on "hover"}
+                    :change #(user/assoc-user! :name @%)
+                    :value (cell= (:name user/user)))))
+              (semfrm/field
+                (label "Email")
+                (seminpt/icon-input
+                  :class [:left]
+                  (i :class [:mail :icon])
+                  (hoplon.core/input
+                    :type "text"
+                    :placeholder "Email"
+                    :data-content "Please enter your email address."
+                    :popup {:on "hover"}
+                    :change #(user/assoc-user! :email @%)
+                    :value (cell= (:email user/user)))))
+              (semfrm/field
+                (label "Phone Number")
+                (seminpt/icon-input
+                  :class [:left]
+                  (i :class [:phone :icon])
+                  (hoplon.core/input
+                    :type "text"
+                    :placeholder "Phone Number"
+                    :data-content "Please enter a number we can reach you at."
+                    :popup {:on "hover"}
+                    :change #(user/assoc-user! :phone @%)
+                    :value (cell= (:phone user/user)))))
+              (sembtn/buttons
+                :buttons true
+                :class [:two]
+                (sembtn/button
+                  :class [:basic :red]
+                  :click #(tenant/update-tenant! (:id @tenant/tenant) {:setup true})
+                  "Cancel")
+                (sembtn/button
+                  :class [:basic :green]
+                  :click #(comp
+                            ;(.post js/jQuery "https://hooks.slack.com/services/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"
+                            ;          (.stringify js/JSON #js {:text "Test slack post!"}))
+                            (.ajax js/jQuery "https://degree9.zendesk.com/api/v2/requests.json"
+                                   (clj->js  {:crossDomain true
+                                              :data {:ticket {:requester {:name "The Customer" :email "thecustomer@domain.com"}
+                                                              :subject "My printer is on fire!"
+                                                              :comment {:body "The smoke is very colorful."}}}
+                                              :dataType "json"
+                                              :method "POST"
+                                              :username "help@degree9.io/token"
+                                              :password "VbwKDMzo1fOXNpvcLA1uaHpg5tmFDhZJfbLZDiTs"
+                                              }) prn)
+                            (prn "Submit!"))
+                  "Submit"))))))))))

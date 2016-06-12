@@ -56,9 +56,13 @@
   []
   (comp
    (hoplon :pretty-print   true)
-   (cljs   :optimizations  :none
+   ;(from-cljsjs :profile :development)
+   (cljs   :optimizations  :advanced
            :source-map     true
-           :compiler-options {:parallel-build true}
+           :compiler-options {:pseudo-names true
+                              :pretty-print true
+                              :language-in :ecmascript5
+                              :parallel-build true}
            )
    (target :dir #{"target"})
    ))
