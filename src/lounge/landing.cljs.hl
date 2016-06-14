@@ -1,19 +1,4 @@
-(ns lounge.landing
-  ;(:refer-hoplon :exclude [footer])
-  (:require [semantic-ui.core :as semui]
-            [semantic-ui.elements.button :as sembtn]
-            [semantic-ui.elements.header :as semhdr]
-            [semantic-ui.elements.list :as semlst]
-            [semantic-ui.elements.container :as semcont]
-            [semantic-ui.elements.divider :as semdiv]
-            [semantic-ui.elements.step :as steps]
-            [semantic-ui.elements.segment :as semseg]
-            [semantic-ui.collections.menu :as semmenu]
-            [semantic-ui.collections.grid :as semgrid]
-            [lounge.firebase :as fb]
-            [lounge.forms :as forms]
-            [lounge.route :as route]
-            [lounge.ui :as ui]))
+(ns lounge.landing)
 
 (defelem landing-header [attr kids]
   (header
@@ -33,9 +18,7 @@
       (h2 "theLounge.io")
       (p "Another project by: " (a :href "http://degree9.io" "degree9"))
       (ul :class [:actions]
-          (li (a :href "#" :class [:special :button]
-                 :click #(comp (fb/login!) (route/dash!))
-                 "Public Preview"))))
+          (li (a :href "https://app.thelounge.io" :class [:special :button] "Public Preview"))))
     (a :href "#one" :class [:more :scrolly] "Learn More")))
 
 (defelem landing-intro [attr kids]
@@ -51,7 +34,7 @@
 
 (defelem landing-spotlight [attr kids]
   (section
-    :class [:spotlight]
+    (assoc attr :class [:spotlight])
     (div :class [:image] (first kids))
     (div :class [:content] (rest kids))))
 
@@ -60,19 +43,19 @@
     :id "two"
     :class [:wrapper :alt :style2]
     (landing-spotlight
-      (img :src "images/pic01.jpg")
+      (img :id "img01" :src "images/pic01.jpg")
       (h2 "Computer Systems & Networking")
       (p "Zero Servers. Building your business on the cloud lets you get up and running without investing in on-site hardware."
          (br)
          "We provide simple automated enterprise solutions that directly meet the needs of your business and scale as you grow."))
     (landing-spotlight
-      (img :src "images/pic02.jpg")
+      (img :id "img02" :src "images/pic02.jpg")
       (h2 "POS Solutions")
       (p "Restaurant and Retail Point of Sale systems are rapidly becoming more mobile allowing a greater personal customer experience."
          (br)
          "We provide solutions tailored to top POS brands regardless of what type of dining or shopping experience you wish to provide."))
     (landing-spotlight
-      (img :src "images/pic03.jpg")
+      (img :id "img03" :src "images/pic03.jpg")
       (h2 "Security and Access Control")
       (p "Your business isnt just on the web. No matter what kind of business you operate, you have assets worth protecting."
          (br)
@@ -88,8 +71,7 @@
         (h2 "Preview")
         (p "Our platform is still under development but we encourage you to check things out and provide feedback, for a better experience."))
       (ul :class [:actions :vertical]
-          (li (a :href "" :class [:button :fit :special]
-                 :click #(comp (fb/login!) (route/dash!)) "Login"))
+          (li (a :href "https://app.thelounge.io" :class [:button :fit :special] "Login"))
           (li (a :href "" :class [:button :fit] "Learn More"))))))
 
 (defelem landing-guide [attr kids]
@@ -129,10 +111,11 @@
     (ul :class [:copyright]
         (li "© 2016 Degree9 Solutions Inc.")
         (li "Design: " (a :href "http://html5up.net" "HTML5 UP") " & " (a :href "http://unsplash.com" "UNSPLASH"))
-        (li "Built with: " (a :href "http://hoplon.io" "HOPLON")))))
+        (li "Built with: " (a :href "http://hoplon.io" "HOPLON"))
+        (li "We" (i :class [:icon :fa-heart]) (a :href "http://github.com/degree9/theLounge" "Open-Source")))))
 
 (defelem landing-wrapper [attr kids]
-  (div :id "page-wrapper" :toggle route/home? kids))
+  (div :id "page-wrapper" kids))
 
 (defelem landing [attr kids]
   (landing-wrapper

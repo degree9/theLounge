@@ -3,26 +3,6 @@
   (:require [cljsjs.skel])
   (:require-macros [lounge.skel :refer [with-breakpoint]]))
 
-;; Init Skell Breakpoints
-(defn breakpoints!
-  ([]
-   (breakpoints! :xlarge "1680px"
-                 :large  "1280px"
-                 :medium "980px"
-                 :small  "736px"
-                 :xsmall "480px"))
-  ([& {:keys [xlarge large medium small xsmall]}]
-   (.breakpoints js/skel
-                 #js {:xlarge (str "(max-width:" xlarge ")")
-                      :large  (str "(max-width:" large  ")")
-                      :medium (str "(max-width:" medium ")")
-                      :small  (str "(max-width:" small  ")")
-                      :xsmall (str "(max-width:" xsmall ")")})))
-
-;; Skell Event Methods
-(defn on [events f]
-  (.on js/skel events f))
-
 ;; Skel Defaults
 (def ^:dynamic *skel-loading* (cell true))
 (def ^:dynamic *skel-mobile*  (cell (aget js/skel "vars" "mobile")))
@@ -36,7 +16,23 @@
         attr    (assoc attr :class class)]
     (hoplon.core/body attr kids)))
 
-;; Skell Window Load Complete
+;; Init Skel Breakpoints
+(defn breakpoints!
+  ([]
+   (breakpoints! :xlarge "1680px" :large  "1280px" :medium "980px" :small  "736px" :xsmall "480px"))
+  ([& {:keys [xlarge large medium small xsmall]}]
+   (.breakpoints js/skel
+                 #js {:xlarge (str "(max-width:" xlarge ")")
+                      :large  (str "(max-width:" large  ")")
+                      :medium (str "(max-width:" medium ")")
+                      :small  (str "(max-width:" small  ")")
+                      :xsmall (str "(max-width:" xsmall ")")})))
+
+;; Skel Event Methods
+(defn on [events f]
+  (.on js/skel events f))
+
+;; Skel Window Load Complete
 (-> (js/jQuery js/window)
     (.on "load" #(reset! *skel-loading* false)))
 

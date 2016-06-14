@@ -1,7 +1,11 @@
 {
   "hosting": {
-    "public": "target",
+    "public": "dist",
     "rewrites": [
+      {
+        "source": "/dash**",
+        "destination": "/dash.html"
+      },
       {
         "source": "**",
         "destination": "/index.html"
