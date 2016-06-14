@@ -5,8 +5,8 @@
 (set-env!
  :dependencies   (get-deps)
  ;:checkouts      (get-devdeps)
- :source-paths   #{"src"}
- :resource-paths #{"resources/assets"}
+ ;:source-paths   #{"src"}
+ :resource-paths #{"src" "resources/assets"}
  ;:asset-paths    #{}
  )
 
@@ -53,10 +53,13 @@
   "Build theLounge for deployment"
   []
   (comp
+    (show :fileset true)
+    (sift :include #{#"bower_components/semantic-ui/examples"}
+          :invert true)
     (hoplon)
     ;(from-cljsjs :profile :development)
     (cljs)
-    ;(prerender)
+    (prerender)
     (target)))
 
 (deftask pack
@@ -80,8 +83,6 @@
   []
   (comp
     (bower)
-    (sift :include #{#"bower_components/semantic-ui/dist/semantic.css"
-                     #"bower_components/animate-css/animate.css"})
     (watch)
     (checkout)
     (dev)
