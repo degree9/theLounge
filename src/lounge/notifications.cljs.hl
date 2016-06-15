@@ -53,6 +53,14 @@
   (listen-notifications "default" notifications-default)
   (listen-notifications uid notifications-fb))
 
+(defn logout
+  []
+  (fbdb/disable-listener! (fb/notify "default") "value")
+  (when (:uid @user/user)
+    (fbdb/disable-listener! (fb/notify (:uid @user/user)) "value"))
+  (reset! notifications-fb nil)
+  (reset! notifications-default nil))
+
 (defelem messages [attr kids]
   (semlst/bulleted-list
     (loop-tpl
@@ -64,8 +72,8 @@
     (loop-tpl
       :bindings [[_ notify] (:data-notification attr)]
       (div
-        (semhdr/h5 (cell= (:title notify))
-                   (messages :data-messages (cell= (:messages notify))))))))
+        (semhdr/h5 (cell= (:title notify)))
+        (messages :data-messages (cell= (:messages notify)))))))
 
 (defelem notifications [attr kids]
   (div
@@ -78,9 +86,9 @@
         (notification :data-notification notify)))))
 
 (defelem dash [attr kids]
-  (semgrid/row
-    :class [:centered :middle :aligned]
-    (semgrid/column
-      :width 8
-      :class [:centered :middle :aligned]
-      (notifications :data-notifications notifications-all))))
+  (ui/row
+    :toggle user/isAuth?
+    (semgrid/grid
+      (ui/row
+        (semgrid/column
+          (notifications :data-notifications notifications-all))))))

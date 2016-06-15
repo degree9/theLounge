@@ -17,6 +17,7 @@
  '[hoplon.boot-hoplon :refer :all]
  '[boot-semver.core :refer :all]
  '[degree9.boot-bower :refer :all]
+ '[tolitius.boot-check :as check]
  '[clj-commons-exec :as exec]
  )
 
@@ -24,14 +25,15 @@
   bower    {:install          {:animate-css    "animate.css#master"
                                :semantic-ui    "semantic-ui#next"}}
   checkout {:dependencies     (get-devdeps)}
-  cljs     {:optimizations    :advanced
-            :source-map       true
+  cljs     {:source-map       true
             :compiler-options {:pseudo-names true
                                :pretty-print true
                                :language-in :ecmascript5
                                :parallel-build true}}
   hoplon   {:pretty-print     true}
   target   {:dir              #{"dist"}}
+  sift     {:include          #{#"bower_components/semantic-ui/examples"}
+            :invert           true}
   serve    {:reload           true
             :port             8080})
 
@@ -44,55 +46,37 @@
         (assert (= 0 (:exit cmdresult)) (:err cmdresult)))
       fileset)))
 
-(deftask run-tests
-  "Test"
-  []
-  clojure.core/identity)
-
-(deftask build
-  "Build theLounge for deployment"
+(deftask tests
+  "Run code tests."
   []
   (comp
-    (show :fileset true)
-    (sift :include #{#"bower_components/semantic-ui/examples"}
-          :invert true)
-    (hoplon)
-    ;(from-cljsjs :profile :development)
-    (cljs)
-    (prerender)
-    (target)))
-
-(deftask pack
-  "Pack theLounge for deployment"
-  []
-  (comp
-    (pom)
-    (aot)
-    (uber)
-    (jar)))
+    (check/with-kibit)
+    ;(check/with-yagni)
+    ))
 
 (deftask dev
   "Build theLounge for local development."
   []
   (comp
-    (build)
-    (serve)))
-
-(deftask dev-osx
-  "Build theLounge for local development on OS X."
-  []
-  (comp
     (bower)
+    (sift)
     (watch)
     (checkout)
-    (dev)
-    (speak)))
+    (hoplon)
+    (cljs :optimizations :none)
+    (target)
+    (serve)
+    (speak)
+    (tests)))
 
 (deftask prod
   "Build theLounge for production deployment."
   []
   (comp
     (bower)
-    (build)
-    (version)
-    (pack)))
+    (sift)
+    (hoplon)
+    (cljs :optimizations :advanced)
+    (prerender)
+    (target)
+    (version)))

@@ -21,7 +21,7 @@
                    (when user-role
                      {:role user-role})))
 (cell= (prn user))
-(defc= user-tenants (into #{} (map val (:tenants user))))
+(defc= user-tenants (set (vals (:tenants user))))
 
 (defc= isAuth? (not (nil? user)))
 
@@ -71,11 +71,11 @@
   (fb/listen-val (fb/users uid) state))
 
 (defn persist-user [uid]
-  (-> (fb/users uid)
-      (fbdb/listen-promise
-        "value"
-        #(when-not (fbsnap/exists %)
-           (fbdb/reset! (fb/users uid) {:enabled true})))))
+  (fbdb/listen-promise
+    (fb/users uid)
+    "value"
+    #(when-not (fbsnap/exists %)
+      (fbdb/reset! (fb/users uid) {:enabled true}))))
 
 (defn login [user]
   (.log js/console user)

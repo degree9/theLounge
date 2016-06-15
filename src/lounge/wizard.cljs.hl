@@ -1,0 +1,229 @@
+(ns lounge.wizard
+  (:refer-hoplon :exclude [form])
+  (:require [semantic-ui.core :as semui]
+            [semantic-ui.views.card :as semcard]
+            [semantic-ui.elements.button :as sembtn]
+            [semantic-ui.elements.container :as semcont]
+            [semantic-ui.elements.divider :as semdiv]
+            [semantic-ui.elements.header :as semhdr]
+            [semantic-ui.elements.image :as semimg]
+            [semantic-ui.elements.input :as seminpt]
+            [semantic-ui.elements.list :as semlist]
+            [semantic-ui.elements.step :as semsteps]
+            [semantic-ui.elements.segment :as semseg]
+            [semantic-ui.collections.menu :as semmenu]
+            [semantic-ui.collections.form :as semfrm]
+            [semantic-ui.collections.grid :as semgrid]
+            [semantic-ui.modules.popup]
+            [semantic-ui.modules.modal :as modal]
+            [semantic-ui.modules.progress :as semprog]
+            [semantic-ui.views.item :as semitm]
+            [lounge.ui :as ui]
+            [lounge.firebase :as fb]
+            [lounge.user :as user]
+            [lounge.tenant :as tenant]
+            [lounge.directory :as dir]
+            ;[lounge.forms :as forms]
+            [lounge.route :as route]
+            [lounge.notifications :as notify]
+            [clojure.string :as s]
+            [goog.crypt.base64 :as base64])
+  (:require-macros [lounge.forms :refer [defv defv= deferr deferr=]]))
+
+(defc wizardc nil)
+
+(defelem wizard-deploy [attr kids]
+  (semcard/card
+    :class [:blue]
+    :click #(comp (tenant/update-tenant! (:id @tenant/tenant) {:setup :deploy})
+                  (reset! wizardc :deploy))
+    (semcard/content
+      (semcard/content-header
+        "Deploy a business in the cloud.")
+      (semcard/content-description
+        (semlist/list
+          (semlist/item "Limited or no existing IT."))))))
+
+(defelem wizard-migrate [attr kids]
+  (semcard/card
+    :class [:blue]
+    :click #(comp (tenant/update-tenant! (:id @tenant/tenant) {:setup :migrate})
+                  (reset! wizardc :migrate))
+    (semcard/content
+      (semcard/content-header
+        "Migrate a business to the cloud.")
+      (semcard/content-description
+        (semlist/list
+          (semlist/item "Existing IT? Free Migration Service."))))))
+
+(defelem dash [attr kids]
+  (ui/row
+    :toggle (cell= (and tenant/tenant (:setup tenant/tenant)))
+    (semgrid/grid
+      :class [:middle :aligned :stackable]
+      (ui/row
+        :toggle (cell= (= "deploy" (:setup tenant/tenant)))
+        (semgrid/column
+          (semhdr/h2 "What type of business would you like to deploy?")
+          (semcard/link-cards
+            :cards 2
+            :class [:centered :one :stackable]
+            (semcard/card
+              :class [:blue]
+              (semcard/content
+                (semcard/content-header
+                  "Restaurant or Retailer")
+                (semcard/content-description
+                  (semlist/list
+                    (semlist/item "Brick and Morter business.")
+                    (semlist/item "Point of Sale systems.")))))
+            (semcard/card
+              :class [:blue]
+              (semcard/content
+                (semcard/content-header
+                  "Professional Services")
+                (semcard/content-description
+                  (semlist/list
+                    (semlist/item "Accounting & Law")
+                    (semlist/item "Architecture & Engineering")))))
+            (semcard/card
+              :class [:blue]
+              (semcard/content
+                (semcard/content-header
+                  "Healthcare")
+                (semcard/content-description
+                  (semlist/list
+                    (semlist/item "Dentists")
+                    (semlist/item "Doctors & Pharmasists")))))
+            (semcard/card
+              :class [:blue]
+              (semcard/content
+                (semcard/content-header
+                  "Education & Government")
+                (semcard/content-description
+                  (semlist/list
+                    (semlist/item "Schools")
+                    (semlist/item "Government Organizations")))))
+            (semcard/card
+              :class [:blue]
+              :click #(comp (tenant/dissoc-tenant! (:id @tenant/tenant) :setup)
+                            (route/dash!))
+              (semcard/content
+                (semcard/content-header
+                  "IT & Other...")
+                (semcard/content-description
+                  (semlist/list
+                    (semlist/item "Go straight to the dashboard."))))))))
+      (ui/row
+        :toggle (cell= (true? (:setup tenant/tenant)))
+        (semgrid/column
+          :class [:center :aligned]
+          (semhdr/h2 "Hello, what would you like to do?")
+          (semcard/link-cards
+            :class [:centered :one]
+            (wizard-deploy)
+            (wizard-migrate))))
+      (ui/row
+        :toggle (cell= (= "migrate" (:setup tenant/tenant)))
+        (let [labelc (cell "Contact Info")]
+          (semgrid/column
+          :class [:left :aligned]
+          (semsteps/steps
+            :steps true
+            :class [:top :attached]
+            (semsteps/step
+              :icon [:phone :icon]
+              :title "Contact"
+              "Someone will be in touch!")
+            (semsteps/step
+              :icon [:computer :icon]
+              :title "Analysis"
+              "IT needs identified.")
+            (semsteps/step
+              :icon [:cloud :icon]
+              :title "Public Cloud"
+              "Cloud infrastructure provisioned.")
+            (semsteps/step
+              :icon [:server :icon]
+              :title "App Servers"
+              "App & Business Servers provisioned.")
+            (semsteps/step
+              :icon [:life :ring :icon]
+              :title "Support"
+              "Choose your support option."))
+          (let [progressc (cell 0)]
+            (semprog/progress
+            :class [:bottom :attached :blue]
+            :progress (cell= {:total 5 :value progressc})
+            (semprog/bar)))
+          (semdiv/horizontal-divider (text "~{labelc}")))))
+        (ui/row
+          :class [:centered]
+        :toggle (cell= (= "migrate" (:setup tenant/tenant)))
+        (semgrid/column
+          :class [:left :aligned]
+          :width 5
+          (let [contactc (cell nil)]
+          (semfrm/form
+            :toggle true
+            (semseg/basic-segment
+              (semfrm/field
+                (label "Full Name")
+                (seminpt/icon-input
+                  :class [:left]
+                  (i :class [:user :icon])
+                  (hoplon.core/input
+                    :type "text"
+                    :placeholder "Full Name"
+                    :data-content "Please enter your full name."
+                    :popup {:on "hover"}
+                    :change #(user/assoc-user! :name @%)
+                    :value (cell= (:name user/user)))))
+              (semfrm/field
+                (label "Email")
+                (seminpt/icon-input
+                  :class [:left]
+                  (i :class [:mail :icon])
+                  (hoplon.core/input
+                    :type "text"
+                    :placeholder "Email"
+                    :data-content "Please enter your email address."
+                    :popup {:on "hover"}
+                    :change #(user/assoc-user! :email @%)
+                    :value (cell= (:email user/user)))))
+              (semfrm/field
+                (label "Phone Number")
+                (seminpt/icon-input
+                  :class [:left]
+                  (i :class [:phone :icon])
+                  (hoplon.core/input
+                    :type "text"
+                    :placeholder "Phone Number"
+                    :data-content "Please enter a number we can reach you at."
+                    :popup {:on "hover"}
+                    :change #(user/assoc-user! :phone @%)
+                    :value (cell= (:phone user/user)))))
+              (sembtn/buttons
+                :buttons true
+                :class [:two]
+                (sembtn/button
+                  :class [:basic :red]
+                  :click #(tenant/update-tenant! (:id @tenant/tenant) {:setup true})
+                  "Cancel")
+                (sembtn/button
+                  :class [:basic :green]
+                  :click #(comp
+                            ;(.post js/jQuery "https://hooks.slack.com/services/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"
+                            ;          (.stringify js/JSON #js {:text "Test slack post!"}))
+                            (.ajax js/jQuery "https://degree9.zendesk.com/api/v2/requests.json"
+                                   (clj->js  {:crossDomain true
+                                              :data {:ticket {:requester {:name "The Customer" :email "thecustomer@domain.com"}
+                                                              :subject "My printer is on fire!"
+                                                              :comment {:body "The smoke is very colorful."}}}
+                                              :dataType "json"
+                                              :method "POST"
+                                              :username "help@degree9.io/token"
+                                              :password "VbwKDMzo1fOXNpvcLA1uaHpg5tmFDhZJfbLZDiTs"
+                                              }) prn)
+                            (prn "Submit!"))
+                  "Submit"))))))))))

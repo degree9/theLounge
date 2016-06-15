@@ -4,17 +4,8 @@
   (:require-macros [lounge.skel :refer [with-breakpoint]]))
 
 ;; Skel Defaults
-(def ^:dynamic *skel-loading* (cell true))
-(def ^:dynamic *skel-mobile*  (cell (aget js/skel "vars" "mobile")))
-
-;; Skel Elements
-(defelem body [attr kids]
-  (let [mobile  (or (:mobile attr) *skel-mobile*)
-        loading (or (:loading attr) *skel-loading*)
-        class   (cell= (merge {:is-mobile mobile
-                               :is-loading loading} (:class attr)))
-        attr    (assoc attr :class class)]
-    (hoplon.core/body attr kids)))
+(defc skel-loading true)
+(defc skel-mobile (aget js/skel "vars" "mobile"))
 
 ;; Init Skel Breakpoints
 (defn breakpoints!
@@ -33,9 +24,8 @@
   (.on js/skel events f))
 
 ;; Skel Window Load Complete
-(-> (js/jQuery js/window)
-    (.on "load" #(reset! *skel-loading* false)))
+(.on (js/jQuery js/window) "load" #(reset! skel-loading false))
 
 ;; Skel Toggle Mobile Cell
-(with-breakpoint -medium #(reset! *skel-mobile* false))
-(with-breakpoint +medium #(reset! *skel-mobile* true))
+(with-breakpoint -medium #(reset! skel-mobile false))
+(with-breakpoint +medium #(reset! skel-mobile true))

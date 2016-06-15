@@ -10,6 +10,7 @@
                 [semantic-ui.collections.menu :as semmenu]
                 [semantic-ui.collections.grid :as semgrid]
                 [semantic-ui.behaviors.form]
+                [lounge.auth :as auth]
                 [lounge.firebase :as fb]
                 [lounge.user :as user]
                 [lounge.tenant :as tenant]
@@ -19,14 +20,11 @@
                 [lounge.logging :as log]
                 [lounge.setup :as setup]
                 [lounge.notifications :as notify]
-                [lounge.skel :as skel]
                 [goog.dom]
                 [cljsjs.jquery]
                 [cljsjs.typedjs]
                 [cljsjs.scrollify]
-                [cljs.analyzer]
-                [cljsjs.skel]
-                [cljsjs.scrollex]
+                [firebase-cljs.user :as fbuser]
                 [lounge.analytics :as analytics]))
 
 (html
@@ -36,109 +34,29 @@
     (html-meta :name "viewport" :content "width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1")
 
     (title "theLounge.io - IT Automation")
-    (link :rel "stylesheet" :type "text/css" :href "bower_components/semantic-ui/dist/semantic.css" :disabled (cell= route/home?))
+    (link :rel "stylesheet" :type "text/css" :href "bower_components/semantic-ui/dist/semantic.css")
     (link :rel "stylesheet" :href "bower_components/animate-css/animate.css")
 
     ;; Stripe Checkout
     (script :src "https://checkout.stripe.com/checkout.js")
-    (style "
-             .banner.segment {
-             min-height: 700px;
-             padding: 1em 0em;
-             }
-             .banner .logo.item img {
-             margin-right: 1em;
-             }
-             .banner .ui.menu .ui.button {
-             margin-left: 0.5em;
-             }
-             .banner h1.ui.header {
-             margin-top: 3em;
-             margin-bottom: 0em;
-             font-size: 4em;
-             font-weight: normal;
-             }
-             .banner h2 {
-             font-size: 1.7em;
-             font-weight: normal;
-             }
-
-             .vertical.stripe {
-             padding: 8em 0em;
-             }
-             .vertical.stripe h3 {
-             font-size: 2em;
-             }
-             .vertical.stripe .button + h3,
-             .vertical.stripe p + h3 {
-             margin-top: 3em;
-             }
-             .vertical.stripe .floated.image {
-             clear: both;
-             }
-             .vertical.stripe p {
-             font-size: 1.33em;
-             }
-             .vertical.stripe .horizontal.divider {
-             margin: 3em 0em;
-             }
-
-             .quote.stripe.segment {
-             padding: 0em;
-             }
-             .quote.stripe.segment .grid .column {
-             padding-top: 5em;
-             padding-bottom: 5em;
-             }
-             .last.container {
-             margin-bottom: 300px !important;
-             }
-             .ui.center.header img{
-             margin: 6em 0em 2em;
-             }
-             //#register, .ui.center.header img{
-             //margin: -4em 0em 2em;
-             //}
-             #dash, .centered a > img{
-             margin-top: 6em;
-             }
-             h3.ui.center.header {
-             padding: 2em 0em;}
-
-
-             .footer.segment {
-             padding: 5em 0em;
-             }
-
-             .typed-cursor{
-             opacity: 1;
-             -webkit-animation: blink 0.7s infinite;
-             -moz-animation: blink 0.7s infinite;
-             animation: blink 0.7s infinite;
-             }
-             @keyframes blink{
-             0% { opacity:1; }
-             50% { opacity:0; }
-             100% { opacity:1; }
-             }
-             @-webkit-keyframes blink{
-             0% { opacity:1; }
-             50% { opacity:0; }
-             100% { opacity:1; }
-             }
-             @-moz-keyframes blink{
-             0% { opacity:1; }
-             50% { opacity:0; }
-             100% { opacity:1; }
-             }
-          "))
+    (style
+      "#dash, .centered a > img{
+         margin-top: 6em;
+       }
+       h3.ui.center.header {
+         padding: 2em 0em;}
+      "))
     (body
       (dash/dash)))
 
 (defn handle-login [user]
   (let [uid (user/uid user)]
+    (when @auth/pending-link
+      (comp
+        (fbuser/link user (:cred @auth/pending-link))
+        (reset! auth/pending-link nil)))
     (user/login user)
-    (dir/listen-dir dir/directory-fb)
+    (dir/login uid)
     (notify/login uid)
     (tenant/login uid)))
 
@@ -147,13 +65,15 @@
     (reset! user/user-fb nil)
     (reset! user/user-auth nil)
     (reset! notify/notifications-fb nil)
+    (dir/logout)
+    (notify/logout)
     (tenant/logout)
     ;(reset! tenant/tenant-fb nil)
     ))
 
 ;; Authentication
 (with-init!
-  (fb/auth-changed
+  (auth/auth-changed
     fb/auth
     #(if % (handle-login %) (handle-logout))))
 

@@ -226,7 +226,7 @@
   "Changes URL hash to #setup"
   #(route! :setup))
 
-(defc= unknown? (when (not (or home? dash? setup?)) route))
+(defc= unknown? (when-not (or home? dash? setup?) route))
 
 (defc= routes {:home home? :dash dash? :setup setup? :org org? :infra infra? :infra-pub infra-pub? :infra-priv infra-priv? :svc svc? :unknown unknown?})
 

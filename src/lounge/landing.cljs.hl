@@ -18,7 +18,7 @@
       (h2 "theLounge.io")
       (p "Another project by: " (a :href "http://degree9.io" "degree9"))
       (ul :class [:actions]
-          (li (a :href "https://app.thelounge.io" :class [:special :button] "Public Preview"))))
+          (li (a :href "https://thelounge.io/dash" :class [:special :button] "Public Preview"))))
     (a :href "#one" :class [:more :scrolly] "Learn More")))
 
 (defelem landing-intro [attr kids]
@@ -71,7 +71,7 @@
         (h2 "Preview")
         (p "Our platform is still under development but we encourage you to check things out and provide feedback, for a better experience."))
       (ul :class [:actions :vertical]
-          (li (a :href "https://app.thelounge.io" :class [:button :fit :special] "Login"))
+          (li (a :href "https://thelounge.io/dash" :class [:button :fit :special] "Login"))
           (li (a :href "" :class [:button :fit] "Learn More"))))))
 
 (defelem landing-guide [attr kids]
@@ -107,12 +107,14 @@
         (social-li :href "https://twitter.com/degree9io" :icon :fa-twitter "Twitter")
         (social-li :href "https://www.facebook.com/Degree9Solutions/" :icon :fa-facebook "Facebook")
         (social-li :href "https://www.linkedin.com/company/degree9-solutions-inc." :icon :fa-linkedin "Linkedin")
-        (social-li :href "mailto:help@degree9.io" :icon :fa-envelope-o "Email"))
+        (social-li :href "mailto:help@degree9.io" :icon :fa-envelope-o "Email")
+        (social-li :href "https://github.com/degree9" :icon :fa-github "Github"))
     (ul :class [:copyright]
         (li "© 2016 Degree9 Solutions Inc.")
         (li "Design: " (a :href "http://html5up.net" "HTML5 UP") " & " (a :href "http://unsplash.com" "UNSPLASH"))
-        (li "Built with: " (a :href "http://hoplon.io" "HOPLON"))
-        (li "We" (i :class [:icon :fa-heart]) (a :href "http://github.com/degree9/theLounge" "Open-Source")))))
+        (li "Built with: " (a :href "http://hoplon.io" "HOPLON")))
+    (ul :class [:copyright]
+        (li "We " (i :class [:icon :fa-heart]) (a :href "http://github.com/degree9/theLounge" " Open-Source")))))
 
 (defelem landing-wrapper [attr kids]
   (div :id "page-wrapper" kids))

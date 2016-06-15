@@ -1,5 +1,5 @@
 (ns lounge.dash
-  (:refer-hoplon :exclude [menu main])
+  (:refer-hoplon :exclude [header menu main])
   (:require [semantic-ui.core :as semui]
             [semantic-ui.views.card :as semcard]
             [semantic-ui.elements.button :as sembtn]
@@ -8,26 +8,100 @@
             [semantic-ui.elements.step :as semsteps]
             [semantic-ui.elements.segment :as semseg]
             [semantic-ui.collections.menu :as semmenu]
+            [semantic-ui.collections.message :as semmsg]
+            [semantic-ui.collections.form :as semfrm]
             [semantic-ui.collections.grid :as semgrid]
+            [lounge.auth :as auth]
             [lounge.ui :as ui]
-            [lounge.dash.navigation :as nav]
+            [lounge.navigation :as nav]
             [lounge.firebase :as fb]
             [lounge.route :as route]
             [lounge.user :as user]
             [lounge.setup :as setup]
+            [lounge.wizard :as wizard]
             [lounge.notifications :as notify]))
 
 (defc= dash? (and user/isAuth? route/dash?))
 
+(defelem toolbar [attr kids]
+  (semmenu/menu
+    attr
+    :class [:small :fixed]
+    :toggle user/isAuth?
+    (semmenu/right-item
+      (div :toggle user/isAuth?
+           (sembtn/icon-button
+             :class [:basic]
+             :data-content "Tooltips are in the format: [description][: example]"
+             :popup {:on "hover"}
+             (i :class [:help :icon]))
+           (sembtn/icon-button
+             :class [:basic]
+             :data-content "Make a wish!"
+             :popup {:on "hover"}
+             (i :class [:star :icon]))))
+    (semmenu/item
+      (div :toggle (cell= user/isAuth?)
+           (sembtn/icon-button
+             :class [:basic]
+             :data-content "Bye!"
+             :popup {:on "hover"}
+             :click auth/logout!
+             (i :class [:sign :out :icon])
+             (span "Logout"))))))
+
+(defelem header [attr _]
+  (ui/row
+    attr
+    (semgrid/column
+      (ui/logo))))
+
+(defelem login [attr kids]
+  (ui/row
+    :toggle (cell= (not user/isAuth?))
+    (semgrid/grid
+      (ui/row
+        (semgrid/column
+          :width 6
+          (semfrm/form
+            :class (cell= {:warning auth/pending-link})
+            (semseg/segment
+              :class [:blue]
+              :css {:padding "38px"}
+              (semfrm/field
+                (sembtn/button
+                  :class [:fluid :github]
+                  :toggle (cell= (or (nil? auth/pending-link) (contains? (:providers auth/pending-link) "github.com")))
+                  :click #(auth/login! auth/github-provider)
+                  (i :class [:github :icon])
+                  "Login with Github"))
+                  (semfrm/field
+                    (sembtn/button
+                      :class [:fluid :google :plus]
+                      :toggle (cell= (or (nil? auth/pending-link) (contains? (:providers auth/pending-link) "google.com")))
+                      :click #(auth/login! auth/google-provider)
+                      (i :class [:google :icon])
+                      "Login with Google"))
+                      (semfrm/field
+                        (sembtn/button
+                          :class [:fluid :facebook]
+                          :toggle (cell= (or (nil? auth/pending-link) (contains? (:providers auth/pending-link) "facebook.com")))
+                          :click #(auth/login! auth/facebook-provider)
+                          (i :class [:facebook :icon])
+                          "Login with Facebook")))
+                          (semmsg/warning-message
+                            (loop-tpl :bindings [m (cell= (list (:msg auth/pending-link)))]
+                            (p m)))))))))
+
 (defelem dash [attr kids]
-  (semcont/grid-container
-    (assoc attr
-      :id "dash"
-      :toggle dash?)
-    (ui/toolbar)
-    (ui/header)
-    (notify/dash)
-    (setup/dash)
-    (setup/wizard)
-    (nav/dash)
+  (semcont/container
+    :id "dash"
+    (toolbar)
+    (semgrid/grid
+      (header)
+      (login)
+      (notify/dash)
+      (setup/dash)
+      (wizard/dash)
+      (nav/dash))
     ))

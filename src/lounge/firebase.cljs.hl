@@ -4,8 +4,6 @@
             [clojure.string :as s]
             [firebase-cljs.core :as fb]
             [firebase-cljs.auth :as fbauth]
-            [firebase-cljs.auth.provider :as fbprov]
-            [firebase-cljs.user :as fbuser]
             [firebase-cljs.database :as fbdb]
             [firebase-cljs.database.datasnapshot :as fbsnap]))
 
@@ -15,21 +13,14 @@
    :databaseURL "https://d9lounge.firebaseio.com"
    :storageBucket "firebase-d9lounge.appspot.com"})
 
-(def app (fb/get-app))
-
 (def auth (fb/get-auth))
+
+(def app (fb/get-app))
 
 (def db (fb/get-db))
 
-(def auth-provider (fbprov/google))
-
-(def auth-changed fbauth/auth-changed)
-
-(fbprov/scope-email auth-provider :google)
-
-(fbprov/scope-profile auth-provider :google)
-
-(defn fb->clj [fb]
+(defn fb->clj
+  [fb]
   (-> fb fbsnap/get-value (js->clj :keywordize-keys true)))
 
 (defn users
@@ -62,15 +53,6 @@
   ([fbref korks state] (fbdb/listen fbref korks #(reset! state (fb->clj %))))
   ([fbref korks state failure] (fbdb/listen fbref korks #(reset! state (fb->clj %)) failure)))
 
-
-
-
-(defn login! []
-  (fbauth/login-popup auth auth-provider))
-
-(defn logout! []
-  (fbauth/logout auth))
-
 (defn update-user! [uid udat]
   (fbdb/merge! (users uid) (dissoc udat :uid)))
 
@@ -78,8 +60,3 @@
   (fbdb/reset! (-> db
                    (fbdb/get-in [:directory])
                    (fbdb/get-in korks)) val))
-
-;(defn updateToken! [id tdat]
-;  (-> (getToken id)
-;      (.update (clj->js tdat))))
-
